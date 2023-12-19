@@ -32,3 +32,9 @@ class ProfileUpdateView(LoginRequiredMixin, ProfileRequiredMixin, UpdateView):
 
     def get_object(self, queryset=None):
         return self.request.user.profile
+
+
+
+class ProfileView(LoginRequiredMixin, DetailView):
+    model = Profile
+    template_name = 'profiles/profile.html'

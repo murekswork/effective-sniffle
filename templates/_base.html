@@ -19,10 +19,10 @@
         <li class="nav-item">
           <a class="nav-link active" aria-current="page" href="#">Home</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Link</a>
-        </li>
         {% if user.is_authenticated %}
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'public' %}">Public</a>
+        </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               {{ user.username }}
@@ -56,8 +56,29 @@
         <button class="btn btn-outline-success" type="submit">Search</button>
       </form>
     </div>
+  {% if message %} <p>MESSAGE JHERE</p>
+<ul class="messages">
+        {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+</ul>
+{% endif %}
   </div>
+{% if message %}
+<ul class="messages">
+        {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+</ul>
+{% endif %}
 </nav>
+{% if message %}
+<ul class="messages">
+        {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+</ul>
+{% endif %}
 {% block content %}
 
 {% endblock %}

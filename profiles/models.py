@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.urls import reverse
 
 from accounts.models import CustomUser
 
@@ -22,6 +23,10 @@ class Profile(models.Model):
     location = models.CharField(max_length=255, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+
+    def get_absolute_url(self):
+        return reverse('profile', args=[str(self.user.id)])
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'

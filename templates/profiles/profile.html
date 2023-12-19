@@ -1,9 +1,12 @@
 {% extends '_base.html' %}
 {% load crispy_forms_tags %}
+
 {% block title %}
-    Dates
+{{ profile.first_name }} {{ profile.first_name }}
 {% endblock %}
 
 {% block content %}
-
+{{ profile.first_name }}
+{{ profile.gender }}
+{{ profile.age }}
 {% endblock %}

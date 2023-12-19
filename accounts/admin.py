@@ -15,5 +15,7 @@ class CustomUserAdmin(UserAdmin):
         'is_superuser',
     ]
 
+
+
 admin.site.register(CustomUser, CustomUserAdmin)
 # Register your models here.

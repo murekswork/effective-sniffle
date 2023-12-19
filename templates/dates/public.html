@@ -1,0 +1,11 @@
+{% extends '_base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}
+    Dates
+{% endblock %}
+
+{% block content %}
+{% for profile in profiles %}
+<a href="{{ profile.get_absolute_url }}">{{ profile.last_name }}{{ profile.first_name }}</a>
+{% endfor %}
+{% endblock %}
