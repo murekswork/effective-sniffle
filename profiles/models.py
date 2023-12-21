@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse
 
 from accounts.models import CustomUser
+from project_core.settings import STATIC_ROOT
 
 
 class Profile(models.Model):
@@ -23,6 +24,8 @@ class Profile(models.Model):
     location = models.CharField(max_length=255, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    profile_picture = models.ImageField(blank=True, upload_to='profile_pics/',
+                                        null=True, default='default/default_profile_picture.svg')
 
 
     def get_absolute_url(self):

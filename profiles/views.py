@@ -1,8 +1,10 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q
 from django.shortcuts import render
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, DetailView, TemplateView, UpdateView
+from django.views.generic import CreateView, DetailView, TemplateView, UpdateView, ListView
 
+from like.models import Match, LikeModel
 from .mixins import ProfileRequiredMixin
 from .models import Profile
 from .forms import ProfileCreationForm
@@ -38,3 +40,23 @@ class ProfileUpdateView(LoginRequiredMixin, ProfileRequiredMixin, UpdateView):
 class ProfileView(LoginRequiredMixin, DetailView):
     model = Profile
     template_name = 'profiles/profile.html'
+
+
+class ProfileMatchesView(LoginRequiredMixin, ListView):
+    model = Match
+    context_object_name = 'matches'
+    template_name = 'profiles/profile_matches.html'
+
+    def get_queryset(self):
+        user_profile = self.request.user.profile
+        queryset = Match.objects.filter(Q(profile1=user_profile) | Q(profile2=user_profile))
+        return queryset
+
+
+
+
+
+
+
+
+

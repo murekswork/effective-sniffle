@@ -6,7 +6,10 @@
 {% endblock %}
 
 {% block content %}
-{{ profile.first_name }}
-{{ profile.gender }}
-{{ profile.age }}
+<div class="container">
+    {{ profile.first_name }}
+    {{ profile.gender }}
+    {{ profile.age }}
+    <img src="{{ profile.profile_picture.url }}" width="350" alt="">
+</div>
 {% endblock %}

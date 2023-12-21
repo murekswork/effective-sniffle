@@ -8,5 +8,6 @@
 {% for profile in profiles %}
 <a href="{{ profile.get_absolute_url }}">{{ profile.last_name }}{{ profile.first_name }}</a>
     <a href="{% url 'send_like' pk=profile.user_id %}">LIKE</a>
+    <img src="{{ profile.profile_picture.url }}" width="350" alt="">
 {% endfor %}
 {% endblock %}

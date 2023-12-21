@@ -4,8 +4,9 @@ from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.urls import reverse, resolve
 
+from accounts.models import CustomUser
 from .models import Profile
-from .views import ProfileCreationView, ProfileOverviewView, ProfileUpdateView
+from .views import ProfileCreationView, ProfileOverviewView, ProfileUpdateView, ProfileView
 
 
 class ProfileTests(TestCase):
@@ -67,5 +68,25 @@ class ProfileTests(TestCase):
         self.assertTemplateUsed(response, 'profiles/profile_update.html')
         view = response.resolver_match
         self.assertEqual(view.func.__name__, ProfileUpdateView.as_view().__name__)
+
+    def test_profile_view(self):
+        self.client.login(email='testuser@email.com', password='0xABAD1DEA')
+        User = self.client.get(reverse('profile_overview')).context['request'].user
+        profile = Profile.objects.create(first_name='Test', last_name='User',
+                                         user=User, gender='M',
+                                         orientation='F')
+        User1 = CustomUser.objects.create_user(email='user1@mail.com',
+                                               username='user1',
+                                               password='0xABAD1DEA')
+        profile1 = Profile.objects.create(first_name='Contain', last_name='Test',
+                                         user=User1, gender='M',
+                                         orientation='F')
+        response = self.client.get(profile1.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, template_name='profiles/profile.html')
+        self.assertContains(response, 'Contain')
+        self.assertEqual(response.resolver_match.func.__name__, ProfileView.as_view().__name__)
+
+
 
 # Create your tests here.
