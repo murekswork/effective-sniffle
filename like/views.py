@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import View
@@ -24,7 +25,7 @@ class SendLikeView(LoginRequiredMixin, View):
         if check_match:
             messages.info(request, f'Its a match with {receiver_profile}')
             Match.objects.create(profile1=sender_profile, profile2=receiver_profile).save()
-            match = Match.objects.get(profile1=sender_profile, profile2=receiver_profile)
+            match = Match.objects.get(Q(profile1=sender_profile, profile2=receiver_profile) | Q(profile1=receiver_profile, profile2=sender_profile))
             Chat.objects.create(profile1=sender_profile, profile2=receiver_profile, match=match).save()
             return redirect(reverse('profile_matches'))
         else:

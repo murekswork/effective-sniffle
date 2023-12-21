@@ -20,4 +20,17 @@ class Chat(models.Model):
     def get_absolute_url(self):
         return reverse('chat', args=[str(self.id)])
 
+
+class Message(models.Model):
+
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
+    sender = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='message_sender')
+    receiver = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='message_receiver')
+    chat = models.ForeignKey(Chat, on_delete=models.CASCADE, blank=True)
+    send_at = models.DateTimeField(auto_now_add=True)
+    read_status = models.BooleanField(default=False, blank=False, editable=True)
+    text = models.TextField(blank=True, editable=True, max_length=1024)
+
+    def __str__(self):
+        return self.id
 # Create your models here.
