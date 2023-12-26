@@ -1,91 +1,203 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en, ru">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}{% endblock title %}</title>
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css">
+    <title>Dating</title>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
 </head>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-<body>
-{% load crispy_forms_tags %}
-{% load static %}
-<nav class="navbar navbar-expand-lg bg-body-tertiary">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="{% url 'home' %}">Soul</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="{% url 'profile_chats' %}">Chats</a>
-        </li>
-        {% if user.is_authenticated %}
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'public' %}">Public</a>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              {{ user.username }}
-          </a>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="{% url 'profile_overview' %}">Profile</a></li>
-            <li><a class="dropdown-item" href="{% url 'profile_matches' %}">Matches</a></li>
-            <li><a class="dropdown-item" href="{% url 'my_likes' %}">I liked</a></li>
-            <li><a class="dropdown-item" href="{% url 'liked_me' %}">Liked me</a></li>
-            <li><a class="dropdown-item" href="{% url 'account_logout' %}">Logout</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="#">Something else here</a></li>
-          </ul>
-        </li>
-        {% else %}
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Sign in
-          </a>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="{% url 'account_login' %}">Login</a></li>
-            <li><a class="dropdown-item" href="{% url 'custom_account_signup' %}">Sign up</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="#">Something else here</a></li>
-          </ul>
-        </li>
-        {% endif %}
-        <li class="nav-item">
-          <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-        </li>
-      </ul>
-      <form class="d-flex" role="search">
-        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-success" type="submit">Search</button>
-      </form>
-    </div>
-  {% if message %} <p>MESSAGE JHERE</p>
-<ul class="messages">
-        {% for message in messages %}
-            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-        {% endfor %}
-</ul>
-{% endif %}
-  </div>
-{% if message %}
-<ul class="messages">
-        {% for message in messages %}
-            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-        {% endfor %}
-</ul>
-{% endif %}
-</nav>
-{% if message %}
-<ul class="messages">
-        {% for message in messages %}
-            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-        {% endfor %}
-</ul>
-{% endif %}
-{% block content %}
+<style>
 
-{% endblock %}
+    body {
+        font-family: 'Bebas Neue';
+        background-color: #f4f7f6
+    }
+
+    p {
+        margin-bottom: 0;
+    }
+
+    a{
+        color: black;
+        text-decoration-line: none;
+    }
+    header {
+        position: sticky;
+        top: 0;
+        z-index: 9999999999999;
+        background-color: inherit;
+    }
+    .alert {
+        padding: 0;
+    }
+
+    .text-end {
+        display: flex;
+    }
+
+    .btn-shine {
+        color: #ffb244;
+        background: linear-gradient(to right, #ff4884 0, #c907ff 10%, #ff347c 20%);
+        background-position: 0;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: shine 3s infinite linear;
+        animation-fill-mode: forwards;
+        -webkit-text-size-adjust: none;
+        font-weight: 600;
+        font-size: 25px;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+    @keyframes shine {
+      0% {
+        background-position: 0;}
+      60% {
+        background-position: 180px;}
+      100% {
+          background-position: 180px;
+      }
+    }
+
+</style>
+{#<style>#}
+{#    .navbar {#}
+{#        align-content: center;#}
+{#        align-items: center;#}
+{#        left: 50%;#}
+{#        display: flex;#}
+{#        padding: 0;#}
+{#        margin: 0 auto;#}
+{#    }#}
+{#</style>#}
+<body translate="yes">
+{% load cache %}
+<header class="p-2 mb-2 border bottom" id="header_sticked">
+    <div class="container">
+        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <img src="https://cdn-icons-png.flaticon.com/512/1456/1456517.png   " width="45px" height="40" alt="logo" class="d-inline-block align-text-top">
+            {% if user.is_authenticated %}
+            </a>
+            <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+                <li class="{% if request.path == '/profile/chats/' %}fs-2{% endif %}"><a href="{% url 'profile_chats' %}" class="nav-link px-2 link-dark" style="padding-bottom: 0!important">Chat
+                <li class="{% if request.path == '/dates/public/' %}fs-2{% endif %}"><a href="{% url 'public' %}" class="nav-link px-2 link-dark">Public</a></li>
+                <li class="{% if request.path == '/profile/matches/' %}fs-2{% endif %}"><a href="{% url 'profile_matches' %}" class="nav-link px-2 link-dark">Matches</a></li>
+                <li class="{% if request.path == '/profile/liked_me/' %}fs-2{% endif %}"><a href="{% url 'liked_me' %}" class="nav-link px-2 link-dark">Likes</a></li>
+            </ul>
+            {% endif %}
+            <div class="dropdown text-end">
+                {% if user.is_authenticated %}
+                <li class="nav-link px-2 link-dark" style="color: #ff6196!important;"> <small style="font-size: 13px">Cupids</small></li>
+                <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                <img src="https://cdn-icons-png.flaticon.com/512/2569/2569716.png" alt="cupid-balance" width='32' height='28'>
+                </a>
+                    <ul class="dropdown-menu text-small">
+
+                        <li><a href="#" class="dropdown-item">Balance</a></li>
+                        <li><a href="#" class="dropdown-item">Purchase</a></li>
+
+                    </ul>
+                {% endif %}
+
+                <li class="nav-link px-2 link-dark"><small style="font-size: 13px">Profile</small></li>
+
+                <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img {% if profile.vip_status %} style="border: 3px solid rgba(255,27,126,0.81)"{% endif %} src="{% if profile.profile_photo %}
+                                    {{ profile.profile_photo.image.url }}
+                                {% else %}
+                                    https://cdn-icons-png.flaticon.com/512/1176/1176687.png
+                                {% endif %}" alt='avatar' class="rounded-circle" width="32" height="28">
+                </a>
+
+
+                <ul class="dropdown-menu text-small">
+                    {% if user.is_authenticated %}
+                    <li>
+                        <a href="{% url 'profile_overview' %}" class="dropdown-item">{{ user.profile.first_name }}</a>
+                    </li>
+
+                    <li>
+                        <a href="{% url 'profile_update' %}" class="dropdown-item">Edit profile</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'account_logout' %}" class="dropdown-item">Logout</a>
+                    </li>
+                    {% else %}
+                    <li>
+                        <a href="{% url 'account_login' %}" class="dropdown-item">Login</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'custom_account_signup' %}" class="dropdown-item">Signup</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</header>
+{# old NAVBAR #}
+{#<div class="container">#}
+{#    <nav class="navbar navbar-expand-lg navbar-light bg-light">#}
+{#        <div class="container-fluid">#}
+{#        #}
+{#        <div class="collapse navbar-collapse" id="navbarSupportedContent">#}
+{#            <a class="navbar-brand" href="{% url 'home' %}">#}
+{#                <img src="{% static 'dating-app.png' %}" width="38px" height="30px" alt="logo" class="d-inline-block align-text-top">#}
+{#                Dating#}
+{#            </a>#}
+{#            <ul class="navbar-nav mr-auto">#}
+{#            {% if user.is_authenticated %}#}
+{##}
+{#              <li class="nav-item active">#}
+{#                <a class="nav-link" href="{% url 'profile' %}">Search</a>#}
+{#              </li>#}
+{##}
+{#              <li class="nav-item">#}
+{#                <a class="nav-link" href="{% url 'logout' %}">Logout</a>#}
+{#              </li>#}
+{#                <form action="" class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3"><input type="search" class="form-control"></form>#}
+{#            <div class="dropdown text-end">#}
+{#                <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle show" data-bs-toggle="dropdown" aria-expanded="false">#}
+{#                    <image src="{{ profile.profile_photo.image.url }}" alt="avatar" class="rounded-circle" width="32px" height="32px"></image>#}
+{#                </a>#}
+{#                <ul class="dropdown-menu text-small">#}
+{#                    <li>#}
+{#                        <a href="{% url 'profile' %}" class="dropdown-item">Profile</a>#}
+{#                    </li>#}
+{##}
+{#                    <li>#}
+{#                        <a href="{% url 'logout' %}" class="dropdown-item">Logout</a>#}
+{#                    </li>#}
+{##}
+{#                </ul>#}
+{#            </div>#}
+{#            {% endif %}#}
+{#            </ul>#}
+{#        </div>#}
+{#        </div>#}
+{#    </nav>#}
+{#</div>#}
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% block content %}
+
+    {% endblock %}
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.min.js" integrity="sha384-IDwe1+LCz02ROU9k972gdyvl+AESN10+x7tBKgc9I5HFtuNz0wWnPclzo6p9vxnk" crossorigin="anonymous"></script>
 </body>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </html>

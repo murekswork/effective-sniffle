@@ -10,9 +10,12 @@ services:
       - 8000:8000
     depends_on:
       - db
+      - redis
     environment:
       - "DJANGO_SECRET_KEY=django-insecure-t%mj%nth)%okky7$4ss%d(^y)^m#lp8+dbhtg_1t_*sn&l)=fv"
       - 'DJANGO_DEBUG=True'
+  redis:
+    image: redis
   db:
     image: postgres:13
     volumes:

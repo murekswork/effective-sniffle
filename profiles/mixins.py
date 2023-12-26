@@ -5,6 +5,13 @@ from django.contrib import messages
 
 
 
+class GetSessionContextMixin:
+
+    def get_extra_context(self, *args, **kwargs):
+        context = {}
+        context['user_profile'] = self.request.user.profile
+        return context
+
 class ProfileRequiredMixin:
 
     profile_create_url = 'profile_create'

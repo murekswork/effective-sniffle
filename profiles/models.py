@@ -6,6 +6,15 @@ from accounts.models import CustomUser
 from project_core.settings import STATIC_ROOT
 
 
+class Interest(models.Model):
+    name = models.CharField(max_length=128, blank=False, null=False)
+    image = models.FileField(default='interests_covers/default_interest_cover.svg',
+                             upload_to='interests_covers/')
+    def __str__(self):
+        return self.name
+
+
+
 class Profile(models.Model):
 
     GENDER_CHOICES = [
@@ -26,6 +35,7 @@ class Profile(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     profile_picture = models.ImageField(blank=True, upload_to='profile_pics/',
                                         null=True, default='default/default_profile_picture.svg')
+    interests = models.ManyToManyField(Interest, blank=True, null=True)
 
 
     def get_absolute_url(self):

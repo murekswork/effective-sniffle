@@ -6,7 +6,7 @@ from django.views.generic import CreateView, DetailView, TemplateView, UpdateVie
 
 from like.models import Match, LikeModel
 from .mixins import ProfileRequiredMixin
-from .models import Profile
+from .models import Profile, Interest
 from .forms import ProfileCreationForm
 
 
@@ -22,8 +22,12 @@ class ProfileCreationView(LoginRequiredMixin, CreateView):
 # Create your views here.
 
 
-class ProfileOverviewView(LoginRequiredMixin, TemplateView):
+class ProfileOverviewView(LoginRequiredMixin, ProfileRequiredMixin, TemplateView):
     template_name = 'profiles/profile_overview.html'
+
+    def get_context_data(self, **kwargs):
+        interests = self.request.user.profile.interests.select_related()
+        return {'interests': interests}
 
 
 class ProfileUpdateView(LoginRequiredMixin, ProfileRequiredMixin, UpdateView):
@@ -42,7 +46,7 @@ class ProfileView(LoginRequiredMixin, DetailView):
     template_name = 'profiles/profile.html'
 
 
-class ProfileMatchesView(LoginRequiredMixin, ListView):
+class ProfileMatchesView(LoginRequiredMixin, ProfileRequiredMixin, ListView):
     model = Match
     context_object_name = 'matches'
     template_name = 'profiles/profile_matches.html'

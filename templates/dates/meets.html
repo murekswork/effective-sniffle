@@ -1,0 +1,21 @@
+{% extends '_base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}
+    Dates
+{% endblock %}
+
+{% block content %}
+{% if meet_profile %}
+<a href="{{ meet_profile.get_absolute_url }}">{{ meet_profile.last_name }}{{ meet_profile.first_name }}</a>
+    <a href="{% url 'send_like' pk=meet_profile.user_id %}">LIKE</a>
+    <img src="{{ meet_profile.profile_picture.url }}" width="350" alt="">
+    {% if meet_profile.interests %}
+    {% for interest in meet_profile.interests.select_related %}
+        {{ interest }}
+        <img src="{{ interest.image.url }}" width="35" alt="">
+    {% endfor %}
+    {% endif %}
+{% else %}
+    <h2>You liked all profiles today!</h2>
+{% endif %}
+{% endblock %}

@@ -8,6 +8,9 @@
 {% block content %}
 {% for chat in chats %}
     <a href="{{ chat.get_absolute_url }}">{{ chat }}</a>
+    {% if not chat.message_set.last.read_status %}
+         <h2>Unread message</h2>
+    {% endif %}
 
 {% endfor %}
 {% endblock %}

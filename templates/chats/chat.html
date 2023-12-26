@@ -1,22 +1,62 @@
-{% include '_base.html' %}
-{% load crispy_forms_tags %}
-{% block title %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Real-time Chat</title>
+</head>
+<body>
 
-    {{ chat }}
+<div id="chat-log" cols="100" rows="20">
+        {% for message in chat_messages %}
+        <p>Message from: {{ message.sender }}</p>
+        <p>{{ message.text }}</p>
+        {% endfor %}
+        <p id="message_story">
+        </p>
+    </div><br>
+    <input id="chat-message-input" type="text" size="100"><br>
+    <input id="chat-message-submit" type="button" value="Send">
+    {{ chat_name|json_script:"chat-name" }}
+    <script>
+        const chatName = JSON.parse(document.getElementById('chat-name').textContent);
+        const chatSocket{{ chat.id|replace('-', '') }} = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/chat/sometext'
+            + '/'
+        );
+        chatSocket{{ chat.id|replace('-', '') }}.onopen = function(e) {
+            const message = JSON.parse(e.data);
+            for (let i = 0; i < messages_data.length; i++){
+                document.querySelector('#chat_log').value += (message + '\n')
+            }
+        }
 
-{% endblock %}
+        chatSocket{{ chat.id|replace('-', '') }}.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            var d = document.createElement('div')
+            document.querySelector('#message_story').innerHTML += `Message from: ${data.sender}<div><p>${data.message}</p></div>`;
+        };
 
-{% block content %}
-<div class="container">
-    {% for message in messages %}
-        {{ message.sender }}
-        {{ message.send_at }}
-        {{ message.text }}
-    {% endfor %}
-    <form action="" method="post">
-        {% csrf_token %}
-        {{ form|crispy }}
-        <button type="submit">Send</button>
-    </form>
-</div>
-{% endblock %}
+        chatSocket{{ chat.id|replace('-', '') }}.onclose = function(e) {
+            console.error('Chat socket closed unexpectedly');
+        };
+
+        document.querySelector('#chat-message-input').focus();
+        document.querySelector('#chat-message-input').onkeyup = function(e) {
+            if (e.key === 'Enter') {  // enter, return
+                document.querySelector('#chat-message-submit').click();
+            }
+        };
+
+        document.querySelector('#chat-message-submit').onclick = function(e) {
+            const messageInputDom = document.querySelector('#chat-message-input');
+            const message = messageInputDom.value;
+            chatSocket.send(JSON.stringify({
+                'message': message
+            }));
+            messageInputDom.value = '';
+        };
+    </script>
+
+</body>
+</html>

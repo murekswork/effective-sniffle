@@ -8,10 +8,11 @@ from django.views.generic import ListView
 
 from chats.models import Chat
 from like.models import LikeModel, Match
+from profiles.mixins import ProfileRequiredMixin
 from profiles.models import Profile
 
 
-class SendLikeView(LoginRequiredMixin, View):
+class SendLikeView(LoginRequiredMixin, ProfileRequiredMixin, View):
     def get(self, request, pk, *args, **kwargs):
 
         sender_profile = self.request.user.profile
@@ -27,12 +28,13 @@ class SendLikeView(LoginRequiredMixin, View):
             Match.objects.create(profile1=sender_profile, profile2=receiver_profile).save()
             match = Match.objects.get(Q(profile1=sender_profile, profile2=receiver_profile) | Q(profile1=receiver_profile, profile2=sender_profile))
             Chat.objects.create(profile1=sender_profile, profile2=receiver_profile, match=match).save()
+
             return redirect(reverse('profile_matches'))
         else:
             print('You liked')
             messages.info(request, f'You liked {receiver_profile.first_name}')
         print('SOMETHJFAKSasf')
-        return redirect(reverse('public'))
+        return redirect(request.META.get('HTTP_REFERER'))
 
 
 class ProfileLikedPageView(LoginRequiredMixin, ListView):

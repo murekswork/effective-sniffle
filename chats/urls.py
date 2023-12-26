@@ -1,8 +1,8 @@
 from django.urls import path, include
-from .views import ChatView, ChatsPageView
+from .views import ChatsPageView, chat
 
 
 urlpatterns = [
-    path('chat/<uuid:pk>/', ChatView.as_view(), name='chat'),
+    path("chat/<str:pk>/", chat, name="chat"),
     path('profile/chats/', ChatsPageView.as_view(), name='profile_chats'),
 ]

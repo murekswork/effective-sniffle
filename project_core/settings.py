@@ -33,12 +33,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
+    'daphne',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -59,6 +62,18 @@ INSTALLED_APPS = [
     'chats.apps.ChatsConfig',
 ]
 
+ASGI_APPLICATION = 'project_core.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('redis', 6379)]
+        },
+    },
+}
+WSGI_APPLICATION = 'project.wsgi.application'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -77,6 +92,7 @@ TEMPLATES = [
         'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
+
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
