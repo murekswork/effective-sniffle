@@ -1,43 +1,45 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Real-time Chat</title>
-</head>
-<body>
-
+{% extends '_base.html' %}
+{% block title %}
+{{ chat.profiles }}
+{% endblock %}
+{% block content %}
 <div id="chat-log" cols="100" rows="20">
         {% for message in chat_messages %}
-        <p>Message from: {{ message.sender }}</p>
-        <p>{{ message.text }}</p>
+        <div {% if message.sender == user.profile %} style="padding-left: 80%"{% else %}style="padding-left: 20%"{% endif %}><p style="font-size: 12px">Message from: <a href="{{ message.sender.get_absolute_url }}">{{ message.sender.first_name }}</a></p>
+        {{ message.text }}</div>
         {% endfor %}
         <p id="message_story">
         </p>
     </div><br>
     <input id="chat-message-input" type="text" size="100"><br>
     <input id="chat-message-submit" type="button" value="Send">
+    CHAT ID IS: {{ chat.id }}
     {{ chat_name|json_script:"chat-name" }}
+    asdasd{{ chat_name }}asdas
     <script>
         const chatName = JSON.parse(document.getElementById('chat-name').textContent);
-        const chatSocket{{ chat.id|replace('-', '') }} = new WebSocket(
+        const chatSocketCreate = new WebSocket(
             'ws://'
             + window.location.host
-            + '/ws/chat/sometext'
+            + '/ws/chat/{{ chat.id }}'
             + '/'
         );
-        chatSocket{{ chat.id|replace('-', '') }}.onopen = function(e) {
+
+        chatSocketCreate.onopen = function(e) {
             const message = JSON.parse(e.data);
             for (let i = 0; i < messages_data.length; i++){
                 document.querySelector('#chat_log').value += (message + '\n')
             }
-        }
-
-        chatSocket{{ chat.id|replace('-', '') }}.onmessage = function(e) {
-            const data = JSON.parse(e.data);
-            var d = document.createElement('div')
-            document.querySelector('#message_story').innerHTML += `Message from: ${data.sender}<div><p>${data.message}</p></div>`;
         };
 
-        chatSocket{{ chat.id|replace('-', '') }}.onclose = function(e) {
+        chatSocketCreate.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            var d = document.createElement('div')
+            console.log(data.user_id)
+            document.querySelector('#message_story').innerHTML += `<div style="padding-left: 20%"><p class="muted" style="color: #d63384">new!</p><p style="font-size: 12px">Message from: <a href="#">${data.sender}</a></p>${data.message}</div>`;
+        };
+
+        chatSocketCreate.onclose = function(e) {
             console.error('Chat socket closed unexpectedly');
         };
 
@@ -51,12 +53,14 @@
         document.querySelector('#chat-message-submit').onclick = function(e) {
             const messageInputDom = document.querySelector('#chat-message-input');
             const message = messageInputDom.value;
-            chatSocket.send(JSON.stringify({
+            chatSocketCreate.send(JSON.stringify({
                 'message': message
             }));
             messageInputDom.value = '';
         };
     </script>
+{% endblock %}
+
 
 </body>
 </html>

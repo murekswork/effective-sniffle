@@ -7,9 +7,19 @@ from django.views import View
 from django.views.generic import ListView
 
 from chats.models import Chat
-from like.models import LikeModel, Match
+from like.models import LikeModel, Match, DislikeModel
 from profiles.mixins import ProfileRequiredMixin
 from profiles.models import Profile
+
+
+class SendDislikeView(LoginRequiredMixin, ProfileRequiredMixin, View):
+
+    def get(self, request, pk, *args, **kwargs):
+        sender_profile = self.request.user.profile
+        receiver_profile = Profile.objects.get(user_id=pk)
+        dislike = DislikeModel.objects.create(sender=sender_profile, receiver=receiver_profile).save()
+        match = Match.objects.get_or_create(profile1=sender_profile, profile2=receiver_profile, dislike=True)
+        return redirect(request.META.get('HTTP_REFERER'))
 
 
 class SendLikeView(LoginRequiredMixin, ProfileRequiredMixin, View):
@@ -27,7 +37,9 @@ class SendLikeView(LoginRequiredMixin, ProfileRequiredMixin, View):
             messages.info(request, f'Its a match with {receiver_profile}')
             Match.objects.create(profile1=sender_profile, profile2=receiver_profile).save()
             match = Match.objects.get(Q(profile1=sender_profile, profile2=receiver_profile) | Q(profile1=receiver_profile, profile2=sender_profile))
-            Chat.objects.create(profile1=sender_profile, profile2=receiver_profile, match=match).save()
+            new_chat = Chat.objects.create(match=match)
+            new_chat.profiles.add(sender_profile, receiver_profile)
+            new_chat.save()
 
             return redirect(reverse('profile_matches'))
         else:

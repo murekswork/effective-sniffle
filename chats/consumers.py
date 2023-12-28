@@ -1,4 +1,5 @@
 import json
+import uuid
 
 from asgiref.sync import sync_to_async
 from channels.db import database_sync_to_async
@@ -13,10 +14,23 @@ from django.core import serializers
 class ChatConsumer(AsyncWebsocketConsumer):
 
     chat = None
+    chat_id_stripped = None
+    request_profile = None
+
+    def get_request_profile(self):
+        profile = Profile.objects.get(user_id=self.scope['user'].id)
+        with open('logs.txt', 'w+') as f:
+            f.write(f'{profile.first_name}')
+        return profile.first_name
 
     def send_message(self, text, chat):
-        message_receiver = Chat.profiles.exclude(chat__profiles__in=[self.scope['user'].profile])
-        Message.objects.create(text=text, receiver=message_receiver, sender=self.scope['user'], chat=chat)
+        self.request_profile = self.scope['user'].profile
+        chat_profiles = [profile for profile in chat.get_chat_profiles()]
+        if self.request_profile == chat_profiles[0]:
+            message_receiver = chat_profiles[1]
+        else:
+            message_receiver = chat_profiles[0]
+        Message.objects.create(text=text, receiver=message_receiver, sender=self.request_profile, chat=chat)
 
     def get_last_message(self):
         try:
@@ -29,12 +43,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
         user_profile = await database_sync_to_async(Profile.objects.get)(user=self.scope['user'])
-        self.chat_name = self.scope["url_route"]["kwargs"]["chat_id"]
-        self.chat = await database_sync_to_async(Chat.objects.get)(id=self.chat_name)
+        self.chat_name = self.scope['url_route']['kwargs']['uuid']
+        with open('logs.txt', 'w+') as f:
+            f.write(f'{self.chat_name}123')
+        self.chat = await database_sync_to_async(Chat.objects.get)(id=uuid.UUID(self.chat_name))
+        print(self.chat_id_stripped)
         chat_users = await database_sync_to_async(self.chat.get_chat_profiles)()
+        self.chat_group_name = f"chat_{self.chat_name}"
         if user_profile in chat_users:
 
-            self.chat_group_name = f"chat_{self.chat_name}"
 
             # Join chat group
             await self.channel_layer.group_add(self.chat_group_name, self.channel_name)
@@ -49,7 +66,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
-        sender = self.scope['user'].username
+        sender = await database_sync_to_async(self.get_request_profile)()
 
         # Send message to chat group
         await database_sync_to_async(self.send_message)(text=message, chat=self.chat)

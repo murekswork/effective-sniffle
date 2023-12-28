@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.urls import reverse
@@ -14,6 +16,29 @@ class Interest(models.Model):
         return self.name
 
 
+class RelationFormatsModel(models.Model):
+
+    name = models.CharField(max_length=64, default='Relation')
+    about = models.CharField(max_length=512, default='About')
+    image = models.ImageField(upload_to=f'relation_formats/{name}', blank=True)
+
+    def __str__(self):
+        return self.name
+
+
+def create_user_path(instance, filename):
+    return f'profiles_pics/user_{instance.profile_uploader.user_id}/{filename}'
+
+
+class UploadedProfilePictures(models.Model):
+
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
+    profile_uploader = models.ForeignKey("Profile", on_delete=models.SET_NULL, null=True)
+    image = models.ImageField(blank=True, upload_to=create_user_path)
+
+
+
+
 
 class Profile(models.Model):
 
@@ -21,6 +46,13 @@ class Profile(models.Model):
         ('M', 'MALE'),
         ('F', 'FEMALE'),
         ('O', 'OTHER'),
+    ]
+
+    RELATION_FORMATS = [
+        ('Hunter', 'Want to have some good time'),
+        ('Love', 'Want to find real love'),
+        ('Friend', 'Searching friends'),
+        ('SE', 'Something Else')
     ]
 
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, primary_key=True)
@@ -33,9 +65,28 @@ class Profile(models.Model):
     location = models.CharField(max_length=255, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    profile_picture = models.ImageField(blank=True, upload_to='profile_pics/',
-                                        null=True, default='default/default_profile_picture.svg')
+    profile_main_picture = models.ForeignKey(UploadedProfilePictures, blank=True, null=True, on_delete=models.CASCADE)
+    profile_uploaded_pictures = models.ManyToManyField(UploadedProfilePictures, null=True, blank=True, related_name='uploader')
     interests = models.ManyToManyField(Interest, blank=True, null=True)
+    relation_formats = models.ForeignKey(RelationFormatsModel, on_delete=models.SET_NULL, null=True)
+
+
+    def get_who_disliked_profiles(self):
+        from like.models import DislikeModel
+        who_disliked_profiles = DislikeModel.objects.filter(receiver=self).values_list('sender__user__id', flat=True)
+        return who_disliked_profiles
+
+
+    def get_liked_profiles(self):
+        from like.models import LikeModel
+        liked_profiles = LikeModel.objects.filter(sender=self).values_list('receiver__user__id', flat=True)
+        return liked_profiles
+
+    def get_disliked_profiles(self):
+        from like.models import DislikeModel
+        disliked_profiles = DislikeModel.objects.filter(sender=self).values_list('receiver__user__id', flat=True)
+        return disliked_profiles
+
 
 
     def get_absolute_url(self):

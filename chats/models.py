@@ -20,7 +20,7 @@ class Chat(models.Model):
         return f'Chat {self.profiles}'
 
     def get_absolute_url(self):
-        return reverse('chat', args=[str(self.id)])
+        return reverse('chat', args=[str(self.id)][:5])
 
 
 class Message(models.Model):

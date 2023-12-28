@@ -121,7 +121,7 @@
                 <ul class="dropdown-menu text-small">
                     {% if user.is_authenticated %}
                     <li>
-                        <a href="{% url 'profile_overview' %}" class="dropdown-item">{{ user.profile.first_name }}</a>
+                        <a href="{% url 'profile_overview' %}" class="dropdown-item">{{ user.profile.first_name }} {{ user.profile.last_name }}</a>
                     </li>
 
                     <li>
@@ -185,15 +185,6 @@
 {#        </div>#}
 {#    </nav>#}
 {#</div>#}
-    {% if messages %}
-    <ul class="messages">
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}" role="alert">
-                {{ message }}
-            </div>
-        {% endfor %}
-    </ul>
-    {% endif %}
     {% block content %}
 
     {% endblock %}

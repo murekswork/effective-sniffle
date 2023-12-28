@@ -5,10 +5,13 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views.generic import ListView, View, DetailView, TemplateView
 
-from like.models import LikeModel
+from like.models import LikeModel, DislikeModel
 from profiles.mixins import ProfileRequiredMixin
 from profiles.models import Profile
 
+
+#Util database query functions
+from profiles.profiles_database_queryset_utl_functions import get_filtered_profiles
 
 class PublicPageView(LoginRequiredMixin, ProfileRequiredMixin, ListView):
     model = Profile
@@ -16,10 +19,9 @@ class PublicPageView(LoginRequiredMixin, ProfileRequiredMixin, ListView):
     context_object_name = 'profiles'
 
     def get_queryset(self):
-        profile = self.request.user.profile
-        profile_set = Profile.objects.filter(Q(gender=profile.orientation) & Q(orientation=profile.gender))
-        request_user_likes_list_profiles_id = LikeModel.objects.filter(sender=self.request.user.profile).values_list('receiver__user__id', flat=True)
-        return profile_set.exclude(user__id__in=request_user_likes_list_profiles_id)
+        profile_set = get_filtered_profiles(self.request.user.profile)
+
+        return profile_set
 
 
 class MeetsPageView(LoginRequiredMixin, ProfileRequiredMixin, TemplateView):
@@ -29,13 +31,8 @@ class MeetsPageView(LoginRequiredMixin, ProfileRequiredMixin, TemplateView):
 
 
     def get_queryset(self):
-        profile = self.request.user.profile
-        profile_likes = LikeModel.objects.filter(sender=profile)
-        profiles_liked = profile_likes.values_list('receiver__user__id', flat=True)
-        meets_profile_set = Profile.objects.filter(gender=profile.orientation, orientation=profile.gender)
-        #meets_profile_set_filtered = meets_profile_set.exclude(user__id__in=LikeModel.objects.filter(sender=profile).values('receiver__user__id'))
-        meets_profile_set_filtered = meets_profile_set.exclude(user__id__in=profiles_liked)
-        return meets_profile_set_filtered
+        profile_set = get_filtered_profiles(self.request.user.profile)
+        return profile_set
 
     def get_context_data(self, **kwargs):
         context = {}
