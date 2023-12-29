@@ -5,5 +5,9 @@ Home
 {% endblock %}
 
 {% block content %}
-<h1>Its home page</h1>
+{% if user.is_authenticated %}
+    DIFFERENT BLOCKS WITH INFORMATION ABOUT PARTS OF SITE
+{% else %}
+    CSS ANIMATION HEARTH SIDES JOIN IN MIDDLE AND APPEAR SIGN UP BUTTON
+{% endif %}
 {% endblock %}

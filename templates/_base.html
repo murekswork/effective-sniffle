@@ -88,13 +88,29 @@
             </a>
             <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
                 <li class="{% if request.path == '/profile/chats/' %}fs-2{% endif %}"><a href="{% url 'profile_chats' %}" class="nav-link px-2 link-dark" style="padding-bottom: 0!important">Chat
-                <li class="{% if request.path == '/dates/public/' %}fs-2{% endif %}"><a href="{% url 'public' %}" class="nav-link px-2 link-dark">Public</a></li>
+
+
                 <li class="{% if request.path == '/profile/matches/' %}fs-2{% endif %}"><a href="{% url 'profile_matches' %}" class="nav-link px-2 link-dark">Matches</a></li>
                 <li class="{% if request.path == '/profile/liked_me/' %}fs-2{% endif %}"><a href="{% url 'liked_me' %}" class="nav-link px-2 link-dark">Likes</a></li>
+                <a href="#" class="" data-bs-toggle="dropdown" aria-expanded="false">
+                <li class="{% if request.path == '/dates/public/' %}{% elif request.path == '/dates/meets/' %}fs-2{% endif %}"><p class="nav-link px2 link-dark">Dates</p></li>
+
+                </a>
+
+
+                <ul class="dropdown-menu text-small">
+                    <li>
+                        <a href="{% url 'public' %}" class="dropdown-item">Public</a>
+                    </li>
+
+                    <li>
+                        <a href="{% url 'meets' %}" class="dropdown-item">Meets</a>
+                    </li>
+                </ul>
             </ul>
-            {% endif %}
+
             <div class="dropdown text-end">
-                {% if user.is_authenticated %}
+
                 <li class="nav-link px-2 link-dark" style="color: #ff6196!important;"> <small style="font-size: 13px">Cupids</small></li>
                 <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                 <img src="https://cdn-icons-png.flaticon.com/512/2569/2569716.png" alt="cupid-balance" width='32' height='28'>

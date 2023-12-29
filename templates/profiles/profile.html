@@ -65,7 +65,8 @@
         <h5 class="font-weight-normal">{{ profile.first_name }} {{ profile.last_name }}</h5>
         <p>{{ profile.bio }}</p>
         <div class="my-2 bg-light p-2">
-          <small class="text-muted">What wants:</small> <p class=" fs-2 font-italic mb-0">{{ profile.relation_formats }}</p>
+            <img src="{{ profile.relation_formats.image }}" width="35" alt="">
+          <small class="text-muted">What wants:</small> <p class=" fs-2 font-italic mb-0">{{ profile.relation_formats.about }}</p>
         </div>
         <div class="my-2 bg-light p-2">
           <small class="text-muted">Interests:</small>

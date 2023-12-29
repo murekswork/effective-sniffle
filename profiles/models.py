@@ -88,7 +88,6 @@ class Profile(models.Model):
         return disliked_profiles
 
 
-
     def get_absolute_url(self):
         return reverse('profile', args=[str(self.user.id)])
 
