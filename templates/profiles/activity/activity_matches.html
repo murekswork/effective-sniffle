@@ -1,0 +1,7 @@
+{% extends 'profiles/activity/activity_base.html' %}
+
+{% block activity_child_content %}
+	{% for match in matches %}
+    <p>{{ match }}</p>
+{% endfor %}
+{% endblock %}

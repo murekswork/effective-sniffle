@@ -16,6 +16,31 @@ class Interest(models.Model):
         return self.name
 
 
+class Notification(models.Model):
+    message = models.TextField(blank=False, default='Notification text', max_length=512)
+    type = models.TextField(max_length='128')
+    timestamp = models.DateTimeField(auto_now_add=True)
+    recipient = models.ForeignKey("Profile", on_delete=models.SET_NULL, null=True, related_name='notifications')
+    additional_profile = models.ForeignKey("Profile", on_delete=models.SET_NULL, null=True)
+    read_status = models.BooleanField(default=False)
+
+
+    def create_unread_message_notification_text(self):
+        self.message = f'{self.additional_profile} waits read from you!'
+        return self.message
+
+    def create_new_match_notification_text(self):
+        self.message = f'You have matched with {self.additional_profile}'
+        return self.message
+
+    def __str__(self):
+        return f'{self.recipient} - {self.type}'
+
+
+
+
+
+
 class RelationFormatsModel(models.Model):
 
     name = models.CharField(max_length=64, default='Relation')
@@ -70,6 +95,9 @@ class Profile(models.Model):
     interests = models.ManyToManyField(Interest, blank=True, null=True)
     relation_formats = models.ForeignKey(RelationFormatsModel, on_delete=models.SET_NULL, null=True)
 
+    def get_unread_notifications(self):
+        unread_notifications = Notification.objects.filter(recipient=self, read_status=False)
+        return unread_notifications
 
     def get_who_disliked_profiles(self):
         from like.models import DislikeModel

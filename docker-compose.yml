@@ -12,7 +12,7 @@ services:
       - db
       - redis
     environment:
-      - "DJANGO_SECRET_KEY=django-insecure-t%mj%nth)%okky7$4ss%d(^y)^m#lp8+dbhtg_1t_*sn&l)=fv"
+      - "DJANGO_SECRET_KEY=django-insecure-t%mj%nth)%okky7$$4ss%d(^y)^m#lp8+dbhtg_1t_*sn&l)=fv"
       - 'DJANGO_DEBUG=True'
   redis:
     image: redis

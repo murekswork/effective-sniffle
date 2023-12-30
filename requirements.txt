@@ -1,5 +1,5 @@
-asgiref==3.7.2
 Django==4.0.10
+asgiref==3.7.2
 psycopg2-binary==2.9.9
 sqlparse==0.4.4
 tzdata==2023.3
@@ -10,4 +10,3 @@ pillow==9.0.1
 channels==4.0.0
 daphne==4.0.0
 channels-redis==4.1.0
-django-jinja==3.0.2

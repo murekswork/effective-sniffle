@@ -1,0 +1,13 @@
+{% extends 'profiles/activity/activity_base.html' %}
+
+{% block activity_child_content %}
+<div class="container">
+
+    {% for profile in profiles %}
+
+        {{ profile }}
+
+    {% endfor %}
+
+</div>
+{% endblock %}

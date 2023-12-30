@@ -90,10 +90,14 @@
                 <li class="{% if request.path == '/profile/chats/' %}fs-2{% endif %}"><a href="{% url 'profile_chats' %}" class="nav-link px-2 link-dark" style="padding-bottom: 0!important">Chat
 
 
-                <li class="{% if request.path == '/profile/matches/' %}fs-2{% endif %}"><a href="{% url 'profile_matches' %}" class="nav-link px-2 link-dark">Matches</a></li>
-                <li class="{% if request.path == '/profile/liked_me/' %}fs-2{% endif %}"><a href="{% url 'liked_me' %}" class="nav-link px-2 link-dark">Likes</a></li>
+                <li class="{% if request.path == '/profile/matches/' %}fs-2
+                {% elif request.path == '/profile/i_liked/' %}fs-2
+                {% elif request.path == '/profile/liked_me/' %}fs-2
+
+                {% endif %}"><a href="{% url 'profile_matches' %}" class="nav-link px-2 link-dark">Activity</a></li>
+
                 <a href="#" class="" data-bs-toggle="dropdown" aria-expanded="false">
-                <li class="{% if request.path == '/dates/public/' %}{% elif request.path == '/dates/meets/' %}fs-2{% endif %}"><p class="nav-link px2 link-dark">Dates</p></li>
+                <li class="{% if request.path == '/dates/public/' %}fs-2{% elif request.path == '/dates/meets/' %}fs-2{% endif %}"><p class="nav-link px2 link-dark">Dates</p></li>
 
                 </a>
 
@@ -125,8 +129,9 @@
 
                 <li class="nav-link px-2 link-dark"><small style="font-size: 13px">Profile</small></li>
 
+            
                 <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                    <img {% if profile.vip_status %} style="border: 3px solid rgba(255,27,126,0.81)"{% endif %} src="{% if profile.profile_photo %}
+                    <img  {% if profile.vip_status %} style="border: 3px solid rgba(255,27,126,0.81)"{% endif %} src="{% if profile.profile_photo %}
                                     {{ profile.profile_photo.image.url }}
                                 {% else %}
                                     https://cdn-icons-png.flaticon.com/512/1176/1176687.png
@@ -134,8 +139,12 @@
                 </a>
 
 
+
                 <ul class="dropdown-menu text-small">
                     {% if user.is_authenticated %}
+                    <li>
+                        <a href="{% url 'notifications' %}" class="dropdown-item">Notifications: {{ user.profile.get_unread_notifications.count }}</a>
+                    </li>
                     <li>
                         <a href="{% url 'profile_overview' %}" class="dropdown-item">{{ user.profile.first_name }} {{ user.profile.last_name }}</a>
                     </li>

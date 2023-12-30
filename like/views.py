@@ -9,7 +9,8 @@ from django.views.generic import ListView
 from chats.models import Chat
 from like.models import LikeModel, Match, DislikeModel
 from profiles.mixins import ProfileRequiredMixin
-from profiles.models import Profile
+from profiles.models import Profile, Notification
+from profiles.notifications_functions import create_match_notification
 
 
 class SendDislikeView(LoginRequiredMixin, ProfileRequiredMixin, View):
@@ -19,6 +20,7 @@ class SendDislikeView(LoginRequiredMixin, ProfileRequiredMixin, View):
         receiver_profile = Profile.objects.get(user_id=pk)
         dislike = DislikeModel.objects.create(sender=sender_profile, receiver=receiver_profile).save()
         match = Match.objects.get_or_create(profile1=sender_profile, profile2=receiver_profile, dislike=True)
+
         return redirect(request.META.get('HTTP_REFERER'))
 
 
@@ -41,6 +43,9 @@ class SendLikeView(LoginRequiredMixin, ProfileRequiredMixin, View):
             new_chat.profiles.add(sender_profile, receiver_profile)
             new_chat.save()
 
+            create_match_notification(sender_profile=sender_profile, receiver_profile=receiver_profile)
+            create_match_notification(sender_profile=receiver_profile, receiver_profile=sender_profile)
+
             return redirect(reverse('profile_matches'))
         else:
             print('You liked')
@@ -49,23 +54,23 @@ class SendLikeView(LoginRequiredMixin, ProfileRequiredMixin, View):
         return redirect(request.META.get('HTTP_REFERER'))
 
 
-class ProfileLikedPageView(LoginRequiredMixin, ListView):
-    model = Profile
-    template_name = 'likes/likes_page.html'
-    context_object_name = 'profiles'
-
-    def get_queryset(self):
-        queryset = LikeModel.objects.filter(sender_id=self.request.user.id).values('receiver')
-        profiles_set = [Profile.objects.get(user_id=i['receiver']) for i in queryset]
-        return profiles_set
-
-class LikedMePageView(LoginRequiredMixin, ListView):
-    model = Profile
-    template_name = 'likes/likes_page.html'
-    context_object_name = 'profiles'
-
-    def get_queryset(self):
-        queryset = LikeModel.objects.filter(receiver_id=self.request.user.id).values('sender')
-        profiles_set = [Profile.objects.get(user_id=i['sender']) for i in queryset]
-        return profiles_set
+# class ProfileLikedPageView(LoginRequiredMixin, ListView):
+#     model = Profile
+#     template_name = 'likes/likes_page.html'
+#     context_object_name = 'profiles'
+#
+#     def get_queryset(self):
+#         queryset = LikeModel.objects.filter(sender_id=self.request.user.id).values('receiver')
+#         profiles_set = [Profile.objects.get(user_id=i['receiver']) for i in queryset]
+#         return profiles_set
+#
+# class LikedMePageView(LoginRequiredMixin, ListView):
+#     model = Profile
+#     template_name = 'likes/likes_page.html'
+#     context_object_name = 'profiles'
+#
+#     def get_queryset(self):
+#         queryset = LikeModel.objects.filter(receiver_id=self.request.user.id).values('sender')
+#         profiles_set = [Profile.objects.get(user_id=i['sender']) for i in queryset]
+#         return profiles_set
 # Create your views here.

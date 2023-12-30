@@ -1,0 +1,19 @@
+{% extends '_base.html' %}
+
+{% include crispy_forms_tags %}
+
+{% block content %}
+
+    <a href="{% url 'profile_matches' %}">Matches</a>
+    <a href="{% url 'my_likes' %}">Sent likes</a>
+    <a href="{% url 'liked_me' %}">Liked me</a>
+
+    <div>
+
+        {% block activity_child_content %}
+
+        {% endblock %}
+
+    </div>
+
+{% endblock %}

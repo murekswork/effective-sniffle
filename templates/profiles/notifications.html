@@ -1,0 +1,45 @@
+{% extends '_base.html' %}
+{% include crispy_forms_tags %}
+
+{% block title %}
+    Notification
+{% endblock %}
+
+{% block content %}
+
+{% for notification in notifications %}
+
+
+    {% if not notification.read_status %}
+        {% if notification.type == 'message' %}
+
+        <ul>
+            <li>
+                <p><a href="{{ notification.additional_profile.get_absolute_url }}">{{ notification.message }}</a></p>
+            </li>
+        </ul>
+
+        {% elif notification.type == 'match' %}
+            <li>
+                <p><a href="{% url 'profile_matches' %}">{{ notification.message }}</a></p>
+            </li>
+        {% endif %}
+    {% else %}
+
+        {% if notification.type == 'message' %}
+        <ul>
+            <li>
+                <p><a class="text-muted sm" href="{{ notification.additional_profile.get_absolute_url }}">{{ notification.message }}</a></p>
+            </li>
+        </ul>
+
+        {% elif notification.type == 'match' %}
+            <li>
+                <p><a class='text-muted sm' href="{% url 'profile_matches' %}">{{ notification.message }}</a></p>
+            </li>
+        {% endif %}
+    {% endif %}
+
+{% endfor %}
+
+{% endblock %}
