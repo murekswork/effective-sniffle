@@ -10,12 +10,13 @@
 {% block content %}
 
     {{ bot.profile }}
+    <a href="{% url 'bot-profile-update' pk=bot.profile.pk %}">Update bots profile</a>
     {{ bot.user }}
 
     <div class="container-md">
-    Select bots action!
+    Select bot action!
 
-        <a href="{% url 'bot_send_likes' pk=bot.profile.pk %}">Send Likes!</a>
+        <a href="{% url 'bot_send_likes' pk=bot.pk %}">Send Likes!</a>
     </div>
 
     <div class="container-md">

@@ -5,7 +5,27 @@
 {% endblock %}
 
 {% block content %}
+
+    <a href="{% url 'bots-logic-create-new' gender='M' orientation='F' %}">Create new male</a>
+    <a href="{% url 'bots-logic-create-new' gender='F' orientation='M' %}">Create new female</a>
+
     <div class="container-md">
+        <form method="POST" action="">
+        {% csrf_token %}
+
+        <select name="option" id="">
+            <option value="delete">delete</option>
+            <option value="update-profile-photo">update profile photos</option>
+            <option value="send-likes">send likes</option>
+        </select>
+
+        <select multiple name="bots_selector" id="">
+            {% for bot in bots %}
+                <option  value="{{ bot.pk }}">{{ bot.profile }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Submit</button>
+        </form>
     {% for bot in bots %}
         <li><a href="{{ bot.get_absolute_url }}">{{ bot }}</a></li>
     {% endfor %}
