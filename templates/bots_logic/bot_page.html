@@ -1,0 +1,33 @@
+{% extends '_base.html' %}
+
+{% block title %}
+
+    Bot {{ bot.profile }}
+
+
+{% endblock %}
+
+{% block content %}
+
+    {{ bot.profile }}
+    {{ bot.user }}
+
+    <div class="container-md">
+    Select bots action!
+
+        <a href="{% url 'bot_send_likes' pk=bot.profile.pk %}">Send Likes!</a>
+    </div>
+
+    <div class="container-md">
+    Matches:
+    {% for match in bot_matches %}
+    {{ match }}
+    {% endfor %}
+    <p>
+    Its filtered profiles:
+    {% for profile in filtered_profiles %}
+        {{ profile }}
+    {% endfor %}
+    </p>
+    </div>
+{% endblock %}

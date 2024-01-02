@@ -90,7 +90,7 @@ class Profile(models.Model):
     location = models.CharField(max_length=255, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    profile_main_picture = models.ForeignKey(UploadedProfilePictures, blank=True, null=True, on_delete=models.CASCADE)
+    profile_main_picture = models.ForeignKey(UploadedProfilePictures, blank=True, null=True, on_delete=models.SET_NULL)
     profile_uploaded_pictures = models.ManyToManyField(UploadedProfilePictures, null=True, blank=True, related_name='uploader')
     interests = models.ManyToManyField(Interest, blank=True, null=True)
     relation_formats = models.ForeignKey(RelationFormatsModel, on_delete=models.SET_NULL, null=True)

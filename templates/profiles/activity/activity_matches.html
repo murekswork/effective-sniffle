@@ -1,7 +1,9 @@
 {% extends 'profiles/activity/activity_base.html' %}
 
 {% block activity_child_content %}
+
 	{% for match in matches %}
-    <p>{{ match }}</p>
+    <a href="{{ match.chat.get_absolute_url }}"><p>{{ match }} open </p></a>
+
 {% endfor %}
 {% endblock %}

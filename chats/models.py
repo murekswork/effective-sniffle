@@ -13,6 +13,9 @@ class Chat(models.Model):
     created_at = models.DateTimeField(auto_created=True, auto_now_add=True)
     profiles = models.ManyToManyField(Profile, blank=True)
 
+    def get_last_message(self):
+        return Message.objects.filter(chat=self).order_by('send_at').last()
+
     def get_chat_profiles(self):
         return list(self.profiles.select_related())
 

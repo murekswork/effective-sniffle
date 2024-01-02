@@ -5,7 +5,7 @@
 
     {% for profile in profiles %}
 
-        {{ profile }}
+        <a href="{{ profile.get_absolute_url }}">{{ profile }}</a>
 
     {% endfor %}
 

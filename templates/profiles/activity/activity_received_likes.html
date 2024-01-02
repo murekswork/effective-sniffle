@@ -4,12 +4,12 @@ Likes
 {% endblock %}
 
 {% block activity_child_content %}
-<div class="container">
+
     {% for profile in profiles %}
 
-        {{ profile }}
+        <a href="{{ profile.get_absolute_url }}">{{ profile }}</a>
 
     {% endfor %}
 
-</div>
+
 {% endblock %}

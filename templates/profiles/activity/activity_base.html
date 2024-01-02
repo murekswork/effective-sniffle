@@ -4,16 +4,36 @@
 
 {% block content %}
 
-    <a href="{% url 'profile_matches' %}">Matches</a>
-    <a href="{% url 'my_likes' %}">Sent likes</a>
-    <a href="{% url 'liked_me' %}">Liked me</a>
+<div class="row d-flex justify-content-center">
 
-    <div>
+  <div class="container-md">
+      <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
 
-        {% block activity_child_content %}
+	<li class="fs-5">
+        <a style="{% if request.path == '/profile/matches/' %}color:deeppink;{% else %}color:black;{% endif %}" class="nav-link px-2" href="{% url 'profile_matches' %}">Matches</a>
+    </li>
 
-        {% endblock %}
+    <li class="fs-5">
+        <a style="{% if request.path == '/profile/i_liked/' %}color:deeppink;{% else %}color:black{% endif %}" class="nav-link px-2" href="{% url 'my_likes' %}">I liked</a>
+    </li>
 
-    </div>
+    <li class="fs-5">
+        <a class="nav-link px-2" style="{% if request.path == '/profile/liked_me/' %}color:deeppink;{% else %}color:black{% endif %}" href="{% url 'liked_me' %}">Liked me</a>
+    </li>
+      </ul>
+
+
+  <div class="row d-flex justify-content-center text-center">
+    {% block activity_child_content %}
+
+    {% endblock %}
+  </div>
+
+</div>
+</nav>
+
+</div>
+
+
 
 {% endblock %}

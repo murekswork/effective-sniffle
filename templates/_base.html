@@ -87,7 +87,7 @@
             {% if user.is_authenticated %}
             </a>
             <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-                <li class="{% if request.path == '/profile/chats/' %}fs-2{% endif %}"><a href="{% url 'profile_chats' %}" class="nav-link px-2 link-dark" style="padding-bottom: 0!important">Chat
+                <li class="{% if request.path == '/profile/chats/' %}fs-2" style="color: deeppink;{% endif %}"><a href="{% url 'profile_chats' %}" class="nav-link px-2 link-dark" style="padding-bottom: 0!important">Chat
 
 
                 <li class="{% if request.path == '/profile/matches/' %}fs-2

@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'dates.apps.DatesConfig',
     'like.apps.LikeConfig',
     'chats.apps.ChatsConfig',
+    'bots_logic.apps.BotsLogicConfig',
 ]
 
 ASGI_APPLICATION = 'project_core.asgi.application'

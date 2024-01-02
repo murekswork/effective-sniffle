@@ -23,6 +23,12 @@ class SendDislikeView(LoginRequiredMixin, ProfileRequiredMixin, View):
 
         return redirect(request.META.get('HTTP_REFERER'))
 
+def send_like(sender, receiver):
+    check_like_from_receiver = LikeModel.objects.filter(sender=receiver, receiver=sender)
+    if check_like_from_receiver:
+        Match.objects.create(profile1=sender_profile, profile2=receiver_profile)
+    like = LikeModel.objects.create(sender=sender, receiver=receiver)
+
 
 class SendLikeView(LoginRequiredMixin, ProfileRequiredMixin, View):
     def get(self, request, pk, *args, **kwargs):

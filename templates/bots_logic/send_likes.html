@@ -1,0 +1,13 @@
+{% extends '_base.html' %}
+
+{% block title %}
+	Bots Send like view
+{% endblock %}
+
+{% block content %}
+    <div class="container-md">
+    {% for bot in bots %}
+        <li><a href="{{ bot.get_absolute_url }}">{{ bot }}</a></li>
+    {% endfor %}
+    </div>
+{% endblock %}

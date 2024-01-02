@@ -3,19 +3,62 @@
 {{ chat.profiles }}
 {% endblock %}
 {% block content %}
-<div id="chat-log" cols="100" rows="20">
+
+    <div class="overflow-auto d-inline">
+
         {% for message in chat_messages %}
-        <div {% if message.sender == user.profile %} style="padding-left: 80%"{% else %}style="padding-left: 20%"{% endif %}><p style="font-size: 12px">Message from: <a href="{{ message.sender.get_absolute_url }}">{{ message.sender.first_name }}</a></p>
-        {{ message.text }}</div>
+          <li class="d-flex justify-content-{% if message.sender == user.profile %}start{% else %}end{% endif %}">
+              <p class="small mb-1">{{ message.sender }}</p>
+              <p class="small mb-1 text-muted">{{ message.send_at}}</p>
+            </li>
+
+            {% if message.sender == user.profile %}
+            <div style="text-align: left" class="d-flex flex-row justify-content-start mb-4 pt-1">
+            {% else %}
+            <div style="text-align: right" class="d-flex flex-row justify-content-end mb-4 pt-1">
+            {% endif %}
+              {% if message.sender == user.profile %}
+
+                <img class="rounded-circle" src="{{ message.sender.profile_main_picture.image.url }}"
+                alt="avatar 1" style="width: 60px; height: 100%;">
+
+              {% endif %}
+
+              <div>
+                <p class="small p-2 ms-3 mb-3 rounded-3" style="background-color: #f5f6f7;">{{ message.text }}</p>
+              </div>
+
+             {% if not message.sender == user.profile %}
+
+            <img src="{{ message.sender.profile_main.picture.image.url }}"
+                alt="avatar 1" style="width: 45px; height: 100%;">
+                 </div>
+                 </div>
+                 </div>
+
+            {% endif %}
+
+            </div>
         {% endfor %}
-        <p id="message_story">
-        </p>
-    </div><br>
-    <input id="chat-message-input" type="text" size="100"><br>
-    <input id="chat-message-submit" type="button" value="Send">
-    CHAT ID IS: {{ chat.id }}
-    {{ chat_name|json_script:"chat-name" }}
-    asdasd{{ chat_name }}asdas
+        <div id="message_story" style="padding-bottom: 10%"></div>
+        </ul>
+    </div>
+
+    {{ chat_name|json_script:'chat-name' }}
+        <div class="w-100" style="position: fixed; top: 90%; ">
+            <div class="form-outline">
+              <input  type="text"  class="form-control" id="chat-message-input" rows="4">
+            </div>
+          <input style="position:absolute; top: 0; left: 90%" type="button" value="Send" id="chat-message-submit" class="justify-content-end btn btn-info btn-rounded float-end">Send</input>
+        </div>
+    </div>
+
+
+{#    <input id="chat-message-input" type="text" size="100"><br>#}
+{#    <input id="chat-message-submit" type="button" value="Send">#}
+{#    CHAT ID IS: {{ chat.id }}#}
+{#    {{ chat_name|json_script:"chat-name" }}#}
+{#    asdasd{{ chat_name }}asdas#}
     <script>
         const chatName = JSON.parse(document.getElementById('chat-name').textContent);
         const chatSocketCreate = new WebSocket(
@@ -36,7 +79,36 @@
             const data = JSON.parse(e.data);
             var d = document.createElement('div')
             console.log(data.user_id)
-            document.querySelector('#message_story').innerHTML += `<div style="padding-left: 20%"><p class="muted" style="color: #d63384">new!</p><p style="font-size: 12px">Message from: <a href="#">${data.sender}</a></p>${data.message}</div>`;
+            document.querySelector('#message_story').innerHTML += `<li class="d-flex justify-content-start">
+              <p class="small mb-1">{{ message.sender }}</p>
+              <p class="small mb-1 text-muted">{{ message.send_at}}</p>
+            </li>
+
+            {% if message.sender == user.profile %}
+            <div style="text-align: left" class="d-flex flex-row justify-content-start mb-4 pt-1">
+            {% else %}
+            <div style="text-align: right" class="d-flex flex-row justify-content-end mb-4 pt-1">
+            {% endif %}
+              {% if message.sender == user.profile %}
+
+                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava5-bg.webp"
+                alt="avatar 1" style="width: 45px; height: 100%;">
+
+              {% endif %}
+
+              <div>
+                <p class="small p-2 ms-3 mb-3 rounded-3" style="background-color: #f5f6f7;">${data.message}</p>
+              </div>
+
+             {% if not message.sender == user.profile %}
+
+            <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava5-bg.webp"
+                alt="avatar 1" style="width: 45px; height: 100%;">
+                 </div>
+                 </div>
+                 </div>
+
+            {% endif %}`;
         };
 
         chatSocketCreate.onclose = function(e) {
