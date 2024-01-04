@@ -30,7 +30,7 @@ def send_like(sender, receiver):
     like = LikeModel.objects.create(sender=sender, receiver=receiver)
 
 
-class SendLikeView(LoginRequiredMixin, ProfileRequiredMixin, View):
+class AjaxSendLikeView(LoginRequiredMixin, ProfileRequiredMixin, View):
     def get(self, request, pk, *args, **kwargs):
 
         sender_profile = self.request.user.profile
