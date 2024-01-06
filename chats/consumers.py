@@ -10,6 +10,7 @@ from .models import Message, Chat
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.core import serializers
 
+import datetime
 
 class ChatConsumer(AsyncWebsocketConsumer):
 
@@ -21,16 +22,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
         profile = Profile.objects.get(user_id=self.scope['user'].id)
         with open('logs.txt', 'w+') as f:
             f.write(f'{profile.first_name}')
-        return profile.first_name
+        return profile
 
-    def send_message(self, text, chat):
-        self.request_profile = self.scope['user'].profile
+    def send_message(self, sender_id, text, chat):
+        sender_profile = Profile.objects.get(user_id=sender_id)
+        # request_profile = self.scope['user'].profile
         chat_profiles = [profile for profile in chat.get_chat_profiles()]
-        if self.request_profile == chat_profiles[0]:
+        if sender_profile == chat_profiles[0]:
             message_receiver = chat_profiles[1]
         else:
             message_receiver = chat_profiles[0]
-        Message.objects.create(text=text, receiver=message_receiver, sender=self.request_profile, chat=chat)
+        message = Message.objects.create(text=text, receiver=message_receiver, sender=sender_profile, chat=chat)
+        return message.send_at
 
     def get_last_message(self):
         try:
@@ -40,6 +43,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def get_chat_messages(self):
         return database_sync_to_async(Message.objects.all)()
+
+    def chat_read_messages(self):
+        self.chat.chat_messages.filter(sender__user__in=[self.scope['user']]).update(read_status=True)
 
     async def connect(self):
         user_profile = await database_sync_to_async(Profile.objects.get)(user=self.scope['user'])
@@ -57,6 +63,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.channel_layer.group_add(self.chat_group_name, self.channel_name)
 
             await self.accept()
+            await database_sync_to_async(self.chat_read_messages)()
 
 
     async def disconnect(self, close_code):
@@ -66,17 +73,33 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
+        sender_id = text_data_json['sender_id']
+        sender_profile_photo_url = text_data_json['sender_profile_photo_url']
+        sender_name = text_data_json['sender_name']
+        with open('logs1.txt', 'a') as f:
+            f.write(text_data)
         sender = await database_sync_to_async(self.get_request_profile)()
 
         # Send message to chat group
-        await database_sync_to_async(self.send_message)(text=message, chat=self.chat)
+        send_time = await database_sync_to_async(self.send_message)(text=message, chat=self.chat, sender_id=sender_id)
         await self.channel_layer.group_send(self.chat_group_name, {'type': 'chat_message',
                                                                    'message': message,
-                                                                   'sender': sender})
+                                                                   'sender_name': sender_name,
+                                                                   'sender_id': sender_id,
+                                                                   'sender_profile_photo_url': sender_profile_photo_url,
+                                                                   'send_time': send_time.strftime('%m-%d-%y %H:%M')})
 
     # Receive message from chat group
     async def chat_message(self, event):
         message = event["message"]
-        sender = event['sender']
+        sender_id = event["sender_id"]
+        sender_profile_photo_url = event['sender_profile_photo_url']
+        sender_name = event['sender_name']
+        send_time = event['send_time']
+        # send_time = str(datetime.datetime.now())
         # Send message to WebSocket
-        await self.send(text_data=json.dumps({"message": message, 'sender': sender}))
+        await self.send(text_data=json.dumps({"message": message,
+                                              'sender_id': sender_id,
+                                              'sender_name': sender_name,
+                                             'sender_profile_photo_url': sender_profile_photo_url,
+                                              'send_time': send_time}))

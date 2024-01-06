@@ -11,7 +11,7 @@
 <div class="container">
 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4">
 {% for profile in profiles %}
-            <div class="col">
+            <div id="{{ profile.pk }}-parent" class="col">
                 <div class="card shadow-lg" style=" align-items: center; text-align: center">
 
                     <div class="profile-photo">
@@ -36,7 +36,7 @@
                     </div>
                     <div class="card-body" style="text-align: center">
                         <p class="card-text">
-                            <a style="color: #ff4298" href="{% url 'send_like' pk=profile.pk %}">Like!</a>
+                            <button class="target" onclick="ajaxSendlike()" id='{{ profile.pk }}' style="color: #ff4298" href="">Like!</button>
                             <a {% if profile.vip_status %}class="fs-4 btn-shine"{% endif %} style="text-decoration: None; color: black;" href="{{ profile.get_absolute_url }}">{{ profile }}</a>
                             <p class="text-muted">City: {{ profile.location }}</p>
                             <p class="text-muted">{{ profile.age }}
@@ -50,6 +50,44 @@
                 </div>
             </div>
         {% endfor %}
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+
+                    function ajaxSendlike() {
+                        let liked_profile = document.getElementById(`${event.srcElement.id}-parent`)
+                        let like_url = 'http://127.0.0.1:8000/like/';
+                        $.ajax({
+                            url: like_url + event.srcElement.id,
+                            success:
+                                function (notification) {
+                                    liked_profile.remove()
+                                    var notificationContainer = document.getElementById('notification-container')
+                                    if (notification.message) {
+                                        var matchNotification = document.createElement('div');
+                                            matchNotification.className = 'some-notification'
+                                            matchNotification.innerHTML = `<p style="color: deeppink!important;"><a style="color: deeppink!important;" href="http://127.0.0.1:8000/profile/${notification.receiver_profile_pk}">${notification.message} ${notification.receiver_profile}</a></p>`
+
+                                            // Add the notification to the container
+                                            notificationContainer.appendChild(matchNotification);
+
+                                            matchNotification.classList.toggle('flashed')
+
+                                            // Remove the notification after a certain time (e.g., 5 seconds)
+                                            if (matchNotification.classList.contains('flashed')){
+                                                setTimeout(function() {
+                                                    matchNotification.remove();
+                                                }, 7000);
+                                            }
+                                        }
+
+
+                            }
+
+                        })}
+
+
+
+    </script>
 </div>
 </div>
 </div>

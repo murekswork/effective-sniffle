@@ -1,18 +1,18 @@
+import random
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views.generic import ListView, View, DetailView, TemplateView
-import random
+
 from like.models import LikeModel, DislikeModel
 from profiles.mixins import ProfileRequiredMixin
 from profiles.models import Profile, UploadedProfilePictures
-from django.http import JsonResponse
-
-
-#Util database query functions
+# Util database query functions
 from profiles.profiles_database_queryset_utl_functions import get_filtered_profiles
+
 
 class PublicPageView(LoginRequiredMixin, ProfileRequiredMixin, ListView):
     model = Profile
@@ -23,6 +23,7 @@ class PublicPageView(LoginRequiredMixin, ProfileRequiredMixin, ListView):
         profile_set = get_filtered_profiles(self.request.user.profile)
 
         return profile_set
+
 
 def ajax_get_profile(request):
     filtered_profiles = get_filtered_profiles(request.user.profile)
@@ -41,11 +42,10 @@ def ajax_get_profile(request):
                           'profile_url': single_object.get_absolute_url()}
     return JsonResponse(single_object_data)
 
-class MeetsPageView(LoginRequiredMixin, ProfileRequiredMixin, TemplateView):
 
+class MeetsPageView(LoginRequiredMixin, ProfileRequiredMixin, TemplateView):
     model = Profile
     template_name = 'dates/meets.html'
-
 
     def get_queryset(self):
         profile_set = get_filtered_profiles(self.request.user.profile)
@@ -54,7 +54,8 @@ class MeetsPageView(LoginRequiredMixin, ProfileRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = dict()
         try:
-            context['meet_profile'] = random.choice(get_filtered_profiles(request_profile=self.request.user.profile))        # if meet_profile:
+            context['meet_profile'] = random.choice(
+                get_filtered_profiles(request_profile=self.request.user.profile))  # if meet_profile:
         except:
             pass
         #     context['meet_profile'] = meet_profile[0]

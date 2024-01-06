@@ -23,16 +23,18 @@
         margin-bottom: 0;
     }
 
-    a{
+    a {
         color: black;
         text-decoration-line: none;
     }
+
     header {
         position: sticky;
         top: 0;
         z-index: 9999999999999;
         background-color: inherit;
     }
+
     .alert {
         padding: 0;
     }
@@ -57,13 +59,64 @@
     }
 
     @keyframes shine {
-      0% {
-        background-position: 0;}
-      60% {
-        background-position: 180px;}
-      100% {
-          background-position: 180px;
-      }
+        0% {
+            background-position: 0;
+        }
+        60% {
+            background-position: 180px;
+        }
+        100% {
+            background-position: 180px;
+        }
+    }
+
+    .some-notification {
+    color: deeppink!important;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    color: #000000;
+    cursor: pointer;
+    }
+
+    .some-notification:before {
+        position: absolute;
+        background-color: gray;
+    }
+
+    .some-notification:after {
+        background-color: deeppink;
+        position: absolute;
+    }
+
+    .some-notification.flashed::before,
+    .some-notification.flashed::after {
+        background-color: #ff1650;
+    }
+
+    .some-notification.flashed {
+        animation: flashed 7s;
+    }
+
+    @keyframes flashed {
+        0% {
+            transform: scale(0,5) translateX(50%);
+        }
+
+        15% {
+            transform: scale(1) translateY(-5%);
+        }
+
+        35% {
+            transform: translateY(-15%);
+        }
+
+        75% {
+            transform: scale(1);
+        }
+        100% {
+            transform: scale(1) translateX(500%);
+        }
     }
 
 </style>
@@ -79,46 +132,54 @@
 {#</style>#}
 <body translate="yes">
 {% load cache %}
+{% load static %}
 <header class="p-2 mb-2 border bottom" id="header_sticked">
     <div class="container">
         <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
             <a class="navbar-brand" href="{% url 'home' %}">
-                <img src="https://cdn-icons-png.flaticon.com/512/1456/1456517.png   " width="45px" height="40" alt="logo" class="d-inline-block align-text-top">
-            {% if user.is_authenticated %}
-            </a>
-            <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-                <li class="{% if request.path == '/profile/chats/' %}fs-2" style="color: deeppink;{% endif %}"><a href="{% url 'profile_chats' %}" class="nav-link px-2 link-dark" style="padding-bottom: 0!important">Chat
+                <img src="https://cdn-icons-png.flaticon.com/512/1456/1456517.png   " width="45px" height="40"
+                     alt="logo" class="d-inline-block align-text-top">
+                {% if user.is_authenticated %}
+                    </a>
+                    <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+                        <li class="{% if request.path == '/profile/chats/' %}fs-2" style="color: deeppink;{% endif %}">
+                            <a href="{% url 'profile_chats' %}" class="nav-link px-2 link-dark"
+                               style="padding-bottom: 0!important">Chat
 
 
-                <li class="{% if request.path == '/profile/matches/' %}fs-2
+                                <li class="{% if request.path == '/profile/matches/' %}fs-2
                 {% elif request.path == '/profile/i_liked/' %}fs-2
                 {% elif request.path == '/profile/liked_me/' %}fs-2
 
                 {% endif %}"><a href="{% url 'profile_matches' %}" class="nav-link px-2 link-dark">Activity</a></li>
 
-                <a href="#" class="" data-bs-toggle="dropdown" aria-expanded="false">
-                <li class="{% if request.path == '/dates/public/' %}fs-2{% elif request.path == '/dates/meets/' %}fs-2{% endif %}"><p class="nav-link px2 link-dark">Dates</p></li>
+                                <a href="#" class="" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <li class="{% if request.path == '/dates/public/' %}fs-2{% elif request.path == '/dates/meets/' %}fs-2{% endif %}">
+                                        <p class="nav-link px2 link-dark">Dates</p></li>
 
-                </a>
+                                </a>
 
 
-                <ul class="dropdown-menu text-small">
-                    <li>
-                        <a href="{% url 'public' %}" class="dropdown-item">Public</a>
-                    </li>
+                                <ul class="dropdown-menu text-small">
+                                    <li>
+                                        <a href="{% url 'public' %}" class="dropdown-item">Public</a>
+                                    </li>
 
-                    <li>
-                        <a href="{% url 'meets' %}" class="dropdown-item">Meets</a>
-                    </li>
-                </ul>
-            </ul>
+                                    <li>
+                                        <a href="{% url 'meets' %}" class="dropdown-item">Meets</a>
+                                    </li>
+                                </ul>
+                    </ul>
 
-            <div class="dropdown text-end">
+                    <div class="dropdown text-end">
 
-                <li class="nav-link px-2 link-dark" style="color: #ff6196!important;"> <small style="font-size: 13px">Cupids</small></li>
-                <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                <img src="https://cdn-icons-png.flaticon.com/512/2569/2569716.png" alt="cupid-balance" width='32' height='28'>
-                </a>
+                    <li class="nav-link px-2 link-dark" style="color: #ff6196!important;"><small
+                            style="font-size: 13px">Cupids</small></li>
+                    <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown"
+                       aria-expanded="false">
+                        <img src="https://cdn-icons-png.flaticon.com/512/2569/2569716.png" alt="cupid-balance"
+                             width='32' height='28'>
+                    </a>
                     <ul class="dropdown-menu text-small">
 
                         <li><a href="#" class="dropdown-item">Balance</a></li>
@@ -129,45 +190,82 @@
 
                 <li class="nav-link px-2 link-dark"><small style="font-size: 13px">Profile</small></li>
 
-            
-                <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                    <img  {% if profile.vip_status %} style="border: 3px solid rgba(255,27,126,0.81)"{% endif %} src="{% if profile.profile_photo %}
-                                    {{ profile.profile_photo.image.url }}
+
+                <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown"
+                   aria-expanded="false">
+                    <img  {% if profile.vip_status %} style="border: 3px solid rgba(255,27,126,0.81)"{% endif %}
+                                                      src="{% if user.profile.profile_main_picture %}
+                                    {{user.profile.profile_main_picture.image.url}}
                                 {% else %}
                                     https://cdn-icons-png.flaticon.com/512/1176/1176687.png
                                 {% endif %}" alt='avatar' class="rounded-circle" width="32" height="28">
                 </a>
 
 
-
                 <ul class="dropdown-menu text-small">
                     {% if user.is_authenticated %}
-                    <li>
-                        <a href="{% url 'notifications' %}" class="dropdown-item">Notifications: {{ user.profile.get_unread_notifications.count }}</a>
-                    </li>
-                    <li>
-                        <a href="{% url 'profile_overview' %}" class="dropdown-item">{{ user.profile.first_name }} {{ user.profile.last_name }}</a>
-                    </li>
+                        <li>
+                            <a href="{% url 'notifications' %}"
+                               class="dropdown-item">Notifications: {{ user.profile.get_unread_notifications.count }}</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'profile_overview' %}"
+                               class="dropdown-item">{{ user.profile.first_name }} {{ user.profile.last_name }}</a>
+                        </li>
 
-                    <li>
-                        <a href="{% url 'profile_update' %}" class="dropdown-item">Edit profile</a>
-                    </li>
-                    <li>
-                        <a href="{% url 'account_logout' %}" class="dropdown-item">Logout</a>
-                    </li>
+                        <li>
+                            <a href="{% url 'profile_update' %}" class="dropdown-item">Edit profile</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'account_logout' %}" class="dropdown-item">Logout</a>
+                        </li>
                     {% else %}
-                    <li>
-                        <a href="{% url 'account_login' %}" class="dropdown-item">Login</a>
-                    </li>
-                    <li>
-                        <a href="{% url 'custom_account_signup' %}" class="dropdown-item">Signup</a>
-                    </li>
+                        <li>
+                            <a href="{% url 'account_login' %}" class="dropdown-item">Login</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'custom_account_signup' %}" class="dropdown-item">Signup</a>
+                        </li>
                     {% endif %}
                 </ul>
+                </div>
+            <div id="notification-container">
+
             </div>
         </div>
     </div>
 </header>
+
+{#Notifications script#}
+{#<script>#}
+{#    document.addEventListener('DOMContentLoaded', function() {#}
+{#    // Get the notification container#}
+{#    var notificationContainer = document.getElementById('notification-container');#}
+{##}
+{#    // Function to create and display a notification#}
+{#    function showNotification(message, level) {#}
+{#        var notification = document.createElement('div');#}
+{#        notification.className = 'notification ' + level;#}
+{#        notification.textContent = message;#}
+{##}
+{#        // Add the notification to the container#}
+{#        notificationContainer.appendChild(notification);#}
+{##}
+{#        // Remove the notification after a certain time (e.g., 5 seconds)#}
+{#        setTimeout(function() {#}
+{#            notification.remove();#}
+{#        }, 5000);#}
+{#    }#}
+{##}
+{#    // Check if there are messages in the Django messages framework#}
+{#    var messages = JSON.parse(document.getElementById('messages').textContent);#}
+{##}
+{#    // Display each message as a notification#}
+{#    messages.forEach(function(message) {#}
+{#        showNotification(message.message, message.level);#}
+{#    });#}
+{#</script>#}
+
 {# old NAVBAR #}
 {#<div class="container">#}
 {#    <nav class="navbar navbar-expand-lg navbar-light bg-light">#}
@@ -211,10 +309,14 @@
 {#    </nav>#}
 {#</div>#}
 
-    {% block content %}
+{% block content %}
 
-    {% endblock %}
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.min.js" integrity="sha384-IDwe1+LCz02ROU9k972gdyvl+AESN10+x7tBKgc9I5HFtuNz0wWnPclzo6p9vxnk" crossorigin="anonymous"></script>
+{% endblock %}
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
+        integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.min.js"
+        integrity="sha384-IDwe1+LCz02ROU9k972gdyvl+AESN10+x7tBKgc9I5HFtuNz0wWnPclzo6p9vxnk"
+        crossorigin="anonymous"></script>
 </body>
 </html>

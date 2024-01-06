@@ -7,11 +7,13 @@ from like.models import Match
 from profiles.models import Profile
 
 
+
 class Chat(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     match = models.OneToOneField(Match, on_delete=models.CASCADE, blank=True)
     created_at = models.DateTimeField(auto_created=True, auto_now_add=True)
     profiles = models.ManyToManyField(Profile, blank=True)
+
 
     def get_last_message(self):
         return Message.objects.filter(chat=self).order_by('send_at').last()
@@ -38,6 +40,5 @@ class Message(models.Model):
 
     def __str__(self):
         return f'Message from {self.sender} to {self.receiver} {self.send_at}'
-
 
 # Create your models here.

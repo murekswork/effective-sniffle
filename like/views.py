@@ -11,9 +11,10 @@ from like.models import LikeModel, Match, DislikeModel
 from profiles.mixins import ProfileRequiredMixin
 from profiles.models import Profile, Notification
 from profiles.notifications_functions import create_match_notification
+from django.http import JsonResponse
 
 
-class SendDislikeView(LoginRequiredMixin, ProfileRequiredMixin, View):
+class AjaxSendDislikeView(LoginRequiredMixin, ProfileRequiredMixin, View):
 
     def get(self, request, pk, *args, **kwargs):
         sender_profile = self.request.user.profile
@@ -22,6 +23,7 @@ class SendDislikeView(LoginRequiredMixin, ProfileRequiredMixin, View):
         match = Match.objects.get_or_create(profile1=sender_profile, profile2=receiver_profile, dislike=True)
 
         return redirect(request.META.get('HTTP_REFERER'))
+
 
 def send_like(sender, receiver):
     check_like_from_receiver = LikeModel.objects.filter(sender=receiver, receiver=sender)
@@ -44,7 +46,9 @@ class AjaxSendLikeView(LoginRequiredMixin, ProfileRequiredMixin, View):
         if check_match:
             messages.info(request, f'Its a match with {receiver_profile}')
             Match.objects.create(profile1=sender_profile, profile2=receiver_profile).save()
-            match = Match.objects.get(Q(profile1=sender_profile, profile2=receiver_profile) | Q(profile1=receiver_profile, profile2=sender_profile))
+            match = Match.objects.get(
+                Q(profile1=sender_profile, profile2=receiver_profile) | Q(profile1=receiver_profile,
+                                                                          profile2=sender_profile))
             new_chat = Chat.objects.create(match=match)
             new_chat.profiles.add(sender_profile, receiver_profile)
             new_chat.save()
@@ -52,13 +56,12 @@ class AjaxSendLikeView(LoginRequiredMixin, ProfileRequiredMixin, View):
             create_match_notification(sender_profile=sender_profile, receiver_profile=receiver_profile)
             create_match_notification(sender_profile=receiver_profile, receiver_profile=sender_profile)
 
-            return redirect(reverse('profile_matches'))
-        else:
-            print('You liked')
-            messages.info(request, f'You liked {receiver_profile.first_name}')
-        print('SOMETHJFAKSasf')
-        return redirect(request.META.get('HTTP_REFERER'))
-
+            notification = {'message': 'You matched with',
+                            'receiver_profile': f'{receiver_profile.first_name}',
+                            'receiver_profile_pk': f'{receiver_profile.pk}',
+                            'level': 'success'}
+            return JsonResponse(notification)
+        return JsonResponse({'message': None})
 
 # class ProfileLikedPageView(LoginRequiredMixin, ListView):
 #     model = Profile
