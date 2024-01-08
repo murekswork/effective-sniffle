@@ -1,0 +1,27 @@
+`{% extends '_base.html' %}
+
+{% block content %}
+	<div class="container-md">
+    
+    
+    {% for complain in complains %}
+    	
+        <div class="card">
+            <a href="{{ complain.get_absolute_url }}">
+                <p>Time: {{ complain.time }}</p>
+                <p>Reason: {{ complain.reason }}</p>
+            </a>
+            <p><a href="{{ complain.sender.profile.get_absolute_url }}">Sender: {{ complain.sender }}</a></p>
+            <p><a href="{{ complain.receiver.profile.get_absolute_url }}">Receiver: {{ complain.receiver }}</a></p>
+            <p>Status: {{ complain.status }}</p>
+            <p>Your decision: {{ complain.decision }}</p>
+
+
+        </div>
+        
+    {% endfor %}
+    
+    
+    
+    </div>
+{% endblock %}`

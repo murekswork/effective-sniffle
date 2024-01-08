@@ -1,0 +1,21 @@
+{% extends '_base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+	<div class="container-md">
+        <p>{{ complain.sender }}</p>
+        <p>Receiver: {{ complain.receiver }} - {{ complain.receiver.profile }}</p>
+        <p>{{ complain.reason }}</p>
+        <p>{{ complain.responsible_moderator }}</p>
+        <p>{{ complain.description }}</p>
+        <p>{{ complain.status }}</p>
+        <p>{{ complain.decision }}</p>
+    </div>
+
+        {% for receiver_chat in receiver_chats %}
+
+            <a href="{{ receiver_chat.get_absolute_url }}"><p>{{ receiver_chat }}</p></a>
+
+        {% endfor %}
+
+{% endblock %}
