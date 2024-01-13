@@ -8,6 +8,7 @@ from like.models import Match, LikeModel
 from .mixins import ProfileRequiredMixin
 from .models import Profile, Interest, UploadedProfilePictures, Notification
 from .forms import ProfileCreationForm, ImageForm
+from moderating.forms import ComplainForm
 
 
 class ProfileCreationView(LoginRequiredMixin, CreateView):
@@ -91,6 +92,12 @@ class ProfileUpdateView(LoginRequiredMixin, ProfileRequiredMixin, UpdateView):
 class ProfileView(LoginRequiredMixin, DetailView):
     model = Profile
     template_name = 'profiles/profile.html'
+
+    def get_context_data(self, **kwargs):
+        context = dict()
+        context['profile'] = self.object
+        context['form'] = ComplainForm
+        return context
 
 
 class ProfileActivityMatchesView(LoginRequiredMixin, ProfileRequiredMixin, ListView):

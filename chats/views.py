@@ -1,5 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Q
+from django.db.models import Q, F, BooleanField, Case, When
 from django.http import Http404
 from django.shortcuts import render, redirect
 from django.urls import reverse
@@ -22,9 +22,16 @@ class ChatCBVView(LoginRequiredMixin, ProfileRequiredMixin, DetailView):
         return super(ChatCBVView, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        chat_messages = self.object.chat_messages.select_related().order_by('send_at')
-        chat_messages.filter(receiver=self.request.user.profile).update(read_status=True)
-        return {'chat': self.object, 'chat_messages': chat_messages}
+        chat_messages = self.object.chat_messages.prefetch_related('sender').order_by('send_at')
+        chat_messages_with_read_status = chat_messages.annotate(
+            read_st=Case(
+                When(receiver=self.request.user.profile, then=True),
+                default=False,
+                output_field=BooleanField()
+            )
+        )
+        chat_messages_with_read_status.filter(read_status=False).update(read_status=True)
+        return {'chat': self.object, 'chat_messages': chat_messages_with_read_status}
 
 
 def chat(request, pk):

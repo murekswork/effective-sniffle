@@ -14,13 +14,15 @@
           <div class="card-body">
 
             <ul class="list-unstyled mb-0">
-
+            {% if not chats %}
+            <h3>You have not chats yet</h3>
+            {% else %}
             {% for chat in chats %}
 
-              <li class="p-2 border-bottom" style="background-color: #eee;">
+              <li class="p-3 border-bottom" style="background-color: #eee; border-radius: 10px; margin: 10px;">
                 <a href="{{ chat.get_absolute_url }}" class="d-flex justify-content-between">
                   <div class="d-flex flex-row">
-                    <img src="{{chat.profiles.last.profile_main_picture.image.url}}" alt="avatar"
+                    <img src="" alt="avatar"
                       class="rounded-circle d-flex align-self-center me-3 shadow-1-strong" width="60">
                     <div class="pt-1">
                       <p class="fw-bold mb-0">{% for profile in chat.profiles.select_related %} {{ profile }} {% endfor %}</p>
@@ -39,18 +41,10 @@
             {% endfor %}
 
             </ul>
-
+        {% endif %}
           </div>
         </div>
 
       </div>
 
-
-{% for chat in chats %}
-    <a href="{{ chat.get_absolute_url }}">{% for profile in chat.get_chat_profiles %}{{ profile.first_name }} {% endfor %}</a>
-    {% if not chat.chat_messages.first.read_status %}
-         <h2>Unread message</h2>
-    {% endif %}
-
-{% endfor %}
 {% endblock %}

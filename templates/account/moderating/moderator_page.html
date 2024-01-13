@@ -3,18 +3,23 @@
 {% block content %}
 	<div class="container-md">
     
-    
+    {% if user.is_superuser %}<a style="color: rebeccapurple" href="{% url 'moderators_control_page' %}">Superuser page*</a>
+    {% endif %}
     {% for complain in complains %}
-    	
+
         <div class="card">
             <a href="{{ complain.get_absolute_url }}">
-                <p>Time: {{ complain.time }}</p>
-                <p>Reason: {{ complain.reason }}</p>
+                <p>COMPLAIN ID: {{ complain.id }} </p><p class="small text-muted">Time: {{ complain.time }}</p>
             </a>
+            <p>Reason: {{ complain.reason }}</p>
             <p><a href="{{ complain.sender.profile.get_absolute_url }}">Sender: {{ complain.sender }}</a></p>
             <p><a href="{{ complain.receiver.profile.get_absolute_url }}">Receiver: {{ complain.receiver }}</a></p>
-            <p>Status: {{ complain.status }}</p>
-            <p>Your decision: {{ complain.decision }}</p>
+            {% if complain.status %}<p style="color: green" class="">STATUS: CLOSED</p>
+            {% else %}<p style="color: dodgerblue" class="">STATUS: OPEN</p>
+            {% endif %}
+            {% if complain.user_block_decision %}<p style="color: red">Your decision: {{ complain.user_block_decision }}</p>
+            {% else %}<p style="color: green">Your decision: {{ complain.user_block_decision }}</p>
+            {% endif %}
 
 
         </div>

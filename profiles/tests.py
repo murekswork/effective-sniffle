@@ -19,7 +19,6 @@ class ProfileTests(TestCase):
             password='0xABAD1DEA'
         )
 
-
     def test_not_authenticated_user_profile_creation_access(self):
         response = self.client.get(reverse('profile_create'))
         self.assertEqual(response.status_code, 302)

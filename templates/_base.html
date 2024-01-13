@@ -15,6 +15,7 @@
 <style>
 
     body {
+        margin-top: 0!important;
         font-family: 'Bebas Neue';
         background-color: #f4f7f6
     }
@@ -77,6 +78,8 @@
     border-radius: 5px;
     color: #000000;
     cursor: pointer;
+    position: absolute;
+    top: 25%;
     }
 
     .some-notification:before {
@@ -100,7 +103,7 @@
 
     @keyframes flashed {
         0% {
-            transform: scale(0,5) translateX(50%);
+            transform: translateX(50%);
         }
 
         15% {
@@ -159,7 +162,6 @@
 
                                 </a>
 
-
                                 <ul class="dropdown-menu text-small">
                                     <li>
                                         <a href="{% url 'public' %}" class="dropdown-item">Public</a>
@@ -169,7 +171,15 @@
                                         <a href="{% url 'meets' %}" class="dropdown-item">Meets</a>
                                     </li>
                                 </ul>
-                    </ul>
+
+                {% if user.is_moderator %}
+                <li class="" style="color: deeppink;">
+                            <a href="{% url 'moderator_page' %}" class="nav-link px-2 link-dark"
+                               style="padding-bottom: 0!important; color: red!important;">Moderator Page
+                {% endif %}
+                </ul>
+
+
 
                     <div class="dropdown text-end">
 
@@ -308,7 +318,7 @@
 {#        </div>#}
 {#    </nav>#}
 {#</div>#}
-
+{% load crispy_forms_tags %}
 {% block content %}
 
 {% endblock %}

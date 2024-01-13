@@ -2,20 +2,57 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-	<div class="container-md">
-        <p>{{ complain.sender }}</p>
-        <p>Receiver: {{ complain.receiver }} - {{ complain.receiver.profile }}</p>
-        <p>{{ complain.reason }}</p>
-        <p>{{ complain.responsible_moderator }}</p>
-        <p>{{ complain.description }}</p>
-        <p>{{ complain.status }}</p>
-        <p>{{ complain.decision }}</p>
+
+	<div class="container-md d-flex">
+    <div class="card">
+    <div name="complain-info">
+        <p class="fs-2">Info</p>
+        <a href="{{ complain.sender.profile.get_absolute_url }}"><p class="text-muted">Sender: {{ complain.sender }}</p></a>
+
+        {% if complain.receiver.profile %}<a href="{{ complain.receiver.profile.get_absolute_url }}"><p class="text-muted">Receiver: {{ complain.receiver }} - {{ complain.receiver.profile }}</p></a>
+        {% else %}<p class="text-muted">Receiver: USER DELETED</p>
+        {% endif %}
+
+        <p class="text-muted">Reason: {{ complain.reason }}</p>
+        <p class="text-muted">Responsible: {{ complain.responsible_moderator }}</p>
+        <p class="text-muted">Description: {{ complain.description }}</p>
+
+        {% if complain.status %}<p style="color: green" class="">STATUS: CLOSED</p>
+        {% else %}<p style="color: dodgerblue" class="">STATUS: OPEN</p>
+        {% endif %}
+
+        {% if complain.user_block_decision %}<p style="color: red">Your decision: {{ complain.user_block_decision }}</p>
+        {% else %}<p style="color: green">Your decision: {{ complain.user_block_decision }}</p>
+        {% endif %}
+    </div>
     </div>
 
+    <div class="card">
+    <div class="col md-6" name="receiver-chats">
+        <p class="fs-2">Receiver's chats: </p>
         {% for receiver_chat in receiver_chats %}
 
-            <a href="{{ receiver_chat.get_absolute_url }}"><p>{{ receiver_chat }}</p></a>
+            <a class="text-muted sm" href="{{ receiver_chat.get_absolute_url }}"><p>{{ receiver_chat }}</p></a>
 
         {% endfor %}
+    </div>
+    </div>
+
+    </div>
+        {% if not complain.status %}
+        <div class="form-control">
+            <form action="" method="post">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <button type="submit">Save</button>
+            </form>
+        </div>
+        {% else %}
+        <div class="form-control">
+        {{ complain.decision_explanation }}
+        </div>
+        {% endif %}
+
+
 
 {% endblock %}

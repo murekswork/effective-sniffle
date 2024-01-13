@@ -1,4 +1,4 @@
-.venv
+*.venv
 __pycache__/
 db.sqlite3
 *.png
@@ -6,3 +6,5 @@ db.sqlite3
 *.jpeg
 logs.txt
 logs1.txt
+**docker**
+*venv*

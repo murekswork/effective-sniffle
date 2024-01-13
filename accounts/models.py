@@ -10,5 +10,6 @@ class CustomUser(AbstractUser):
 
 	def set_moderator(self):
 		self.is_moderator = True
+		self.save()
 		return self.is_moderator
 # Create your models here.

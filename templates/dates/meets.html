@@ -132,7 +132,7 @@
             width: 26.6px;
             height: 41.6px;
             border-radius: 40px 40px 0 0;
-            background-color: #9a9a9a;
+            background-color: #4b4b4b;
             content: "";
             cursor: pointer;
             transition: background .4s;
@@ -147,7 +147,7 @@
             width: 26.6px;
             height: 41.6px;
             border-radius: 40px 40px 0 0;
-            background-color: #616161;
+            background-color: #4b4b4b;
             content: "";
             cursor: pointer;
             transition: background .4s;
@@ -206,8 +206,8 @@
         <div class="col">
             {% if meet_profile %}
                 <div id="profile-card">
-                    <div class="card shadow-lg">
-                        <img src="{{ meet_profile.profile_main_picture.image.url }}" width="350" alt="">
+                    <div class="card shadow-lg" style="align-items: center">
+                        <img src="{{ meet_profile.profile_main_picture.image.url }}" width="350" height="350" alt="">
                         <div class="container">
 
                             <div class="card-image">
@@ -228,7 +228,6 @@
                                 Name: <a href='{{ meet_profile.get_absolute_url }}'>{{ meet_profile.first_name }}
                                 {{ meet_profile.last_name }}</a>
                             <p>Bio {{ meet_profile.bio }}</p>
-                            <p id='profile_pk' value='{{ meet_profile.pk }}'>PK {{ meet_profile.pk }}</p>
 
                             </p>
                         </div>
@@ -238,7 +237,7 @@
                 <div id="like-button-parent" class="btn-group">
 
                     {% csrf_token %}
-                    <button value="{{ meet_profile.pk }}" id="ajax-like-button" class="btn" name="like" type="submit">
+                    <button onclick="ajaxSendlike()" value="{{ meet_profile.pk }}" id="ajax-like-button" class="btn" name="like" type="submit">
                         <div class="heart-like-button"></div>
                     </button>
                     </a>
@@ -247,7 +246,7 @@
                 <div id="dislike-button-parent" class="btn-group">
 
                     {% csrf_token %}
-                    <button value="{{ meet_profile.pk }}" id="ajax-dislike-button" class="btn" name="like" type="submit">
+                    <button onclick="ajaxSenddislike()" value="{{ meet_profile.pk }}" id="ajax-dislike-button" class="btn" name="like" type="submit">
                         <div class="heart-dislike-button"></div>
                     </button>
                     </a>
@@ -297,16 +296,28 @@
             {#                    </div>#}
             {#                </ul>#}
             {#            {% endif %}#}
+            <div class="hidden-div"></div>
             <div class="container-md">
                 <h1 id="profile-name"></h1>
                 <h1 id="profile-pk"></h1>
-                <img src="" id="profile-image" alt="" width="350">
+
             </div>
             <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
             <script type="text/javascript">
+                    change_profile();
+                    let global_get_action_profile_url
+                    function  ajaxSenddislike() {
+                        $.ajax({
+                            url: global_change_profile_url_dislike,
+                            success: change_profile,
 
-                    change_profile()
+                        })
+                    };
+                    {% if profile %}
+                    let global_change_profile_url_dislike = '{% url 'ajax-send-dislike' pk=pk %}'
+                    let global_change_profile_url_like = '{% url 'ajax-send-like' pk=pk %}'
+                    {% endif %}
 
                     function change_profile() {
                         $.ajax({
@@ -314,12 +325,12 @@
                             success:
                                 function (single_object_data) {
                                     if (single_object_data.pk) {
-                                        profile_pk = single_object_data.pk;
-                                        document.getElementById('ajax-like-button').value = single_object_data.pk
-                                        document.getElementById('ajax-dislike-button').value = single_object_data.pk
+                                        global_change_profile_url_dislike = single_object_data.global_change_profile_url_dislike
+                                        global_change_profile_url_like = single_object_data.global_change_profile_url_like
+                                        global_get_action_profile_url = single_object_data.global_change_profile_url_like
                                         document.getElementById('profile-card').innerHTML =
-                                            `<div class="card shadow-lg">
-                                                <img src="${single_object_data.photo_url}" width="350" alt="">
+                                            `<div class="card shadow-lg" style="align-items: center">
+                                                <img src="${single_object_data.photo_url}" width="350" height="350" alt="">
                                                 <div class="container">
                                                 <div class="card-image">
 
@@ -339,36 +350,22 @@
                                     }
                                 }
 
-                        });
+                        })};
 
-
-
-                    $('#ajax-dislike-button').click(ajaxSenddislike)
-
-                    function  ajaxSenddislike() {
-                        let profile_pk = document.getElementById('ajax-dislike-button').value
-                        let dislike_url = 'http://127.0.0.1:8000/dislike/'
-                        $.ajax({
-                            url: dislike_url + profile_pk,
-                            success: change_profile
-
-                        })
-                    }
-
-                    $('#ajax-like-button').click(ajaxSendlike)
 
                     function ajaxSendlike() {
                         let profile_pk = document.getElementById('ajax-like-button').value
+
                         let like_url = 'http://127.0.0.1:8000/like/'
                         $.ajax({
-                            url: like_url + profile_pk,
+                            url: global_change_profile_url_like,
                             success:
                                 function (notification) {
                                     var notificationContainer = document.getElementById('notification-container')
                                     if (notification.message) {
                                         var matchNotification = document.createElement('div');
                                             matchNotification.className = 'some-notification'
-                                            matchNotification.innerHTML = `<p style="color: deeppink!important;"><a style="color: deeppink!important;" href="http://127.0.0.1:8000/profile/${notification.receiver_profile_pk}">${notification.message} ${notification.receiver_profile}</a></p>`
+                                            matchNotification.innerHTML = `<p style="color: deeppink!important;"><a style="color: deeppink!important;" href="${global_get_action_profile_url}">${notification.message} ${notification.receiver_profile}</a></p>`
 
                                             // Add the notification to the container
                                             notificationContainer.appendChild(matchNotification);
@@ -381,17 +378,14 @@
                                                     matchNotification.remove();
                                                 }, 7000);
                                             }
-                                        }
+                                        };
                                     change_profile()
 
                                 },
 
 
                         })
-                    }
-
-
-                };
+                    };
 
                 document.addEventListener('DOMContentLoaded', function () {
                     var dislikeButton = document.querySelector('.heart-dislike-button');

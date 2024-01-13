@@ -1,5 +1,6 @@
 {% extends '_base.html' %}
 {% load crispy_forms_tags %}
+{% load static %}
 
 {% block content %}
     <style>
@@ -46,23 +47,29 @@
     </div>
 
 
-        <div class="mb-2 d-flex">
-          <h4 class="font-weight-normal btn-shine">{{ profile.first_name}} {{ profile.last_name }}</h4>
-        </div>
 
+
+    {% if profile.user.is_active %}
         <div>
           <img src="{{ profile.profile_main_picture.image.url }}" width="300" alt="">
 
             {% for image in profile.profile_uploaded_pictures.select_related %}
-                <a href="{% url 'profile_update_main_picture' pk=image.id %}"><img src="{{ image.image.url }}" width="80" alt=""></a>
+                <a href="{% url 'profile_update_main_picture' pk=image.id %}"><img  src="{{ image.image.url }}" width="80" alt=""></a>
             {% endfor %}
         </div>
+  {% endif %}
 
 
 
       </div>
       <div class="col-lg-7 col-md-6 pl-xl-3">
-        <h5 class="font-weight-normal">{{ profile.first_name }} {{ profile.last_name }}</h5>
+      <div class="d-flex">
+          <a class="fs-2"> {{ profile.first_name }} {{ profile.last_name }}</a>
+      {% if profile.user.is_active %}
+        <a class="font-weight-normal"><a style="--link-hover-color: red!important;" class="d-flex" onclick="ajaxSendcomplainGet()" id="complain-button"><img class="" src="{% static 'icons/_send_complain.png' %}" width="35px!important" alt=""></a>
+
+     </div>
+
         <p>{{ profile.bio }}</p>
         <div class="my-2 bg-light p-2">
             <img src="{{ profile.relation_formats.image }}" width="35" alt="">
@@ -73,7 +80,7 @@
           {% if profile.interests %}
             <div class="d-flex ml-auto" >
               {% for hob in profile.interests.select_related %}
-                  <img src="{{ hob.image.url }}" width="25" height="25" fill="pink" class="bi bi-controller" viewBox="0 0 16 16">
+                  <img class="img thumbnail" src="{{ hob.image.url }}" width="25" height="25" fill="pink" class="bi bi-controller" viewBox="0 0 16 16">
                   {{ hob }}
               {% endfor %}
             </div>
@@ -103,15 +110,81 @@
       <div class="col-md-5" style="text-align: center">
             <div class="container">
 {#                {{ user.profile.first_name }} gifts#}
-            <div class="row row-cols-4 row-cols-sm-3 row-cols-md-4 g-4" style="font-size: 12px;">
+            <div class="row" style="font-size: 12px;">
 {#                {% for gift in gifts %}#}
-                <div class="col">
-                    <img class="img-thumbnail" src="" width="50px" alt="profile-gift">
-                    <p>from </p>
-                </div>
-{#                {% endfor %}#}
 
-    </div>
+{#                {% endfor %}#}
+    {% endif %}
+                <div id="complain-form-container"></div>
+
+                <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+                <script type="text/javascript">
+
+
+                    function ajaxSendcomplainPost() {
+                        $.ajax({
+                            url: '{% url 'ajax-send-complain' %}',
+                            type: 'POST',
+                            data: {'description': document.getElementById('id_description').value,
+                                    'profile_pk': '{{ profile.pk }}',
+                                    'reason': document.getElementById('id_reason').value,
+                                'csrfmiddlewaretoken': document.getElementsByName('csrfmiddlewaretoken')[0].value},
+                            success: function (response) {
+                                var notificationContainer = document.getElementById('notification-container')
+                                var matchNotification = document.createElement('div');
+                                            matchNotification.className = 'some-notification'
+                                            matchNotification.innerHTML = `<p style="color: deeppink!important;"><a style="color: orangered!important;"">Complain successfully saved! <p>You report id: ${response.report_id}</p></a></p>`
+
+                                            // Add the notification to the container
+                                            notificationContainer.appendChild(matchNotification);
+
+                                            matchNotification.classList.toggle('flashed')
+
+                                            // Remove the notification after a certain time (e.g., 5 seconds)
+                                            if (matchNotification.classList.contains('flashed')){
+                                                setTimeout(function() {
+                                                    matchNotification.remove();
+                                                }, 7000);
+                                            }
+                                document.getElementById('complain-form-container').innerHTML = ''
+                            }
+                        })
+                    }
+
+                    function closeForm() {
+                        document.getElementById('complain-form-container').innerHTML = ''
+                        document.getElementById('complain-button').hidden = false
+                    }
+
+                    function ajaxSendcomplainGet() {
+                        $.ajax({
+                            url: '{% url 'ajax-send-complain' %}',
+                            type: 'GET',
+                            success: function(complain_form_data) {
+                                document.getElementById('complain-button').hidden = true
+                                document.getElementById('complain-form-container').innerHTML +=
+
+                                    `
+                                    <a onclick='closeForm()' class='small' style='font-size: large;'><img  class='img' width='25px' src='{% static 'icons/_close.png' %}'  name='send_report' type="submit">Close form</a>
+                                    <form class='text-muted' id="complain-form" action="">
+                                        {% csrf_token %}
+                                        {{ form|crispy }}
+                                        <button style='background: #ff0077; width: 60px; color: white;' class='btn' name='send_report' type="submit">Send</button>
+                                    </form>
+                                    `
+                                console.log(complain_form_data)
+
+                                // Add event listener to form submit event
+                                document.getElementById('complain-form').addEventListener('submit', function(event) {
+                                    event.preventDefault();  // Prevent default form submission behavior
+                                    ajaxSendcomplainPost();   // Call AJAX function to handle form submission
+                                });
+                            }
+                        })
+                    }
+
+
+                </script>
 {#    <div class="profile-container">#}
 {##}
 {#        <li>#}

@@ -21,8 +21,7 @@ class AjaxSendDislikeView(LoginRequiredMixin, ProfileRequiredMixin, View):
         receiver_profile = Profile.objects.get(user_id=pk)
         dislike = DislikeModel.objects.create(sender=sender_profile, receiver=receiver_profile).save()
         match = Match.objects.get_or_create(profile1=sender_profile, profile2=receiver_profile, dislike=True)
-
-        return redirect(request.META.get('HTTP_REFERER'))
+        return JsonResponse({'message': None})
 
 
 def send_like(sender, receiver):

@@ -18,7 +18,8 @@ class Complain(models.Model):
 	status = models.BooleanField(default=False)
 
 	# --! Decision: 0 means that user is innocent and 1 means that user bad
-	decision = models.BooleanField(blank=True, default=False)
+	user_block_decision = models.BooleanField(blank=True, default=False)
+	decision_explanation = models.TextField(blank=True, default='Just because!')
 
 	def moderator_chat_access(self):
 		receiver_chats = self.receiver.profile.chat_set.select_related()
@@ -35,11 +36,24 @@ class Complain(models.Model):
 		return receiver_chats
 
 
-	def take_decision(self, kwargs):
-		self.decision = True
-		if kwargs['decision'] == 'block_receiver':
-			return {'decision': 'user blocked!'}
-		return {'decision': 'user not blocked! thanks for you attention!'}
+	def take_decision(self, **kwargs):
+		self.decision_explanation = kwargs['decision_explanation']
+		self.status = True
+		if kwargs['user_block_decision']:
+			self.user_block_decision = True
+			self.receiver.is_active = False
+			profile = self.receiver.profile
+			profile.first_name = 'Profile'
+			profile.last_name = 'is blocked!'
+			## --! Removing moderator from complain receiver chats !--##
+			chats = profile.chat_set.select_related()
+			for chat in chats:
+				chat.profile.remove(self.responsible_moderator.profile)
+	
+			profile.save()
+			self.receiver.save()
+		self.save()
+		return {'user_blocked': self.user_block_decision, 'decision_explanation': self.decision_explanation}
 
 	def __str__(self):
 		return str(self.id)

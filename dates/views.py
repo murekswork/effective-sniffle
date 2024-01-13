@@ -21,7 +21,6 @@ class PublicPageView(LoginRequiredMixin, ProfileRequiredMixin, ListView):
 
     def get_queryset(self):
         profile_set = get_filtered_profiles(self.request.user.profile)
-
         return profile_set
 
 
@@ -39,7 +38,10 @@ def ajax_get_profile(request):
                           'pk': single_object.pk,
                           'photo_url': profile_photo.image.url,
                           'bio': single_object.bio,
-                          'profile_url': single_object.get_absolute_url()}
+                          'profile_url': single_object.get_absolute_url(),
+                          'global_change_profile_url_dislike': reverse('ajax-send-dislike', args=[str(single_object.pk)]),
+                          'global_change_profile_url_like': reverse('ajax-send-like', args=[str(single_object.pk)]),
+                          'global_change_profile_url': reverse('profile', args=[str(single_object.pk)])}
     return JsonResponse(single_object_data)
 
 
@@ -56,8 +58,9 @@ class MeetsPageView(LoginRequiredMixin, ProfileRequiredMixin, TemplateView):
         try:
             context['meet_profile'] = random.choice(
                 get_filtered_profiles(request_profile=self.request.user.profile))  # if meet_profile:
-        except:
+            context['pk'] = f'{Profile.objects.all().last().pk}'
+        except Exception as e:
+            print(e)
             pass
-        #     context['meet_profile'] = meet_profile[0]
         return context
 # Create your views here.

@@ -14,6 +14,7 @@ from pathlib import Path
 
 from django.urls import reverse_lazy
 from environs import Env
+import socket
 
 
 env = Env()
@@ -31,9 +32,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DJANGO_DEBUG')
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*', '192.168.43.20']
 
 
 # Application definition
@@ -54,6 +55,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'allauth',
     'allauth.account',
+    'debug_toolbar',
 
     'accounts.apps.AccountsConfig',
     'profiles.apps.ProfilesConfig',
@@ -61,6 +63,7 @@ INSTALLED_APPS = [
     'like.apps.LikeConfig',
     'chats.apps.ChatsConfig',
     'bots_logic.apps.BotsLogicConfig',
+    'moderating.apps.ModeratingConfig',
 ]
 
 ASGI_APPLICATION = 'project_core.asgi.application'
@@ -83,7 +86,11 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
+
+hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
+INTERNAL_IPS = [ip[:-1] + "1" for ip in ips]
 
 ROOT_URLCONF = 'project_core.urls'
 
@@ -175,10 +182,17 @@ AUTH_USER_MODEL = 'accounts.CustomUser'
 ACCOUNT_LOGOUT_REDIRECT_URL = 'home'
 LOGIN_REDIRECT_URL = 'home'
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST='smtp.gmail.com'
+EMAIL_PORT=587
+EMAIL_HOST_USER = "murekswork@gmail.com"
+EMAIL_HOST_PASSWORD = 0xABAD1DEA
+EMAIL_USE_TLS=True
+DEFAULT_FROM_EMAIL = 'admin@dateking.com'
 
 ACCOUNT_SESSION_REMEMBER = True
 ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = False
+ACCOUNT_PASSWORD_RESET_ENTER_TWICE = False
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
