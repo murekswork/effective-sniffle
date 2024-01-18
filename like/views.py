@@ -13,6 +13,7 @@ from profiles.models import Profile, Notification
 from profiles.notifications_functions import create_match_notification
 from django.http import JsonResponse
 
+from project_core.mixin import NotificationControllerMixin, LikeControllerMixin
 
 class AjaxSendDislikeView(LoginRequiredMixin, ProfileRequiredMixin, View):
 
@@ -25,41 +26,38 @@ class AjaxSendDislikeView(LoginRequiredMixin, ProfileRequiredMixin, View):
 
 
 def send_like(sender, receiver):
-    check_like_from_receiver = LikeModel.objects.filter(sender=receiver, receiver=sender)
-    if check_like_from_receiver:
-        Match.objects.create(profile1=sender_profile, profile2=receiver_profile)
-    like = LikeModel.objects.create(sender=sender, receiver=receiver)
+    like = LikeControllerMixin().like(sender, receiver)
 
 
-class AjaxSendLikeView(LoginRequiredMixin, ProfileRequiredMixin, View):
+class AjaxSendLikeView(LoginRequiredMixin, LikeControllerMixin, ProfileRequiredMixin, View):
     def get(self, request, pk, *args, **kwargs):
 
         sender_profile = self.request.user.profile
-        receiver_profile = Profile.objects.filter(user_id=pk).get()
-        check_existing_like = LikeModel.check_like(sender=sender_profile, receiver=receiver_profile)
-        if check_existing_like:
-            messages.info(request, f'You are already liked {receiver_profile}')
-            return redirect(receiver_profile.get_absolute_url())
-        like = LikeModel.objects.create(sender=sender_profile, receiver=receiver_profile).save()
-        check_match = LikeModel.check_like(sender=receiver_profile, receiver=sender_profile)
-        if check_match:
-            messages.info(request, f'Its a match with {receiver_profile}')
-            Match.objects.create(profile1=sender_profile, profile2=receiver_profile).save()
-            match = Match.objects.get(
-                Q(profile1=sender_profile, profile2=receiver_profile) | Q(profile1=receiver_profile,
-                                                                          profile2=sender_profile))
-            new_chat = Chat.objects.create(match=match)
-            new_chat.profiles.add(sender_profile, receiver_profile)
-            new_chat.save()
+        receiver = Profile.objects.get(user_id=pk)
 
-            create_match_notification(sender_profile=sender_profile, receiver_profile=receiver_profile)
-            create_match_notification(sender_profile=receiver_profile, receiver_profile=sender_profile)
+        like = self.like(sender=sender_profile, receiver=receiver)
 
-            notification = {'message': 'You matched with',
-                            'receiver_profile': f'{receiver_profile.first_name}',
-                            'receiver_profile_pk': f'{receiver_profile.pk}',
-                            'level': 'success'}
-            return JsonResponse(notification)
+        # sender_profile = self.request.user.profile
+        # receiver_profile = Profile.objects.filter(user_id=pk).get()
+        # check_existing_like = LikeModel.check_like(sender=sender_profile, receiver=receiver_profile)
+        # if check_existing_like:
+        #     messages.info(request, f'You are already liked {receiver_profile}')
+        #     return redirect(receiver_profile.get_absolute_url())
+        # like = LikeModel.objects.create(sender=sender_profile, receiver=receiver_profile).save()
+        # like_notification = self.like_notification(like=like)
+        #
+        # check_match = LikeModel.check_like(sender=receiver_profile, receiver=sender_profile)
+        # if check_match:
+        #     messages.info(request, f'Its a match with {receiver_profile}')
+        #     Match.objects.create(profile1=sender_profile, profile2=receiver_profile).save()
+        #     match = Match.objects.get(
+        #         Q(profile1=sender_profile, profile2=receiver_profile) | Q(profile1=receiver_profile,
+        #                                                                   profile2=sender_profile))
+        #     new_chat = Chat.objects.create(match=match)
+        #     new_chat.profiles.add(sender_profile, receiver_profile)
+        #     new_chat.save()
+        #
+        #     notification = self.match_notification(match=match, sender=sender_profile)
         return JsonResponse({'message': None})
 
 # class ProfileLikedPageView(LoginRequiredMixin, ListView):
