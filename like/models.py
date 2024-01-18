@@ -8,6 +8,7 @@ class Match(models.Model):
     matched_at = models.DateTimeField(auto_now_add=True)
     dislike = models.BooleanField(default=False)
 
+
     def __str__(self):
         return F"{self.profile1} matched {self.profile2}"
 
