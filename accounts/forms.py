@@ -9,6 +9,9 @@ class CustomUserCreationForm(UserCreationForm):
         fields = ('email', 'username', 'is_moderator')
 
 
+
+
+
 class CustomUserChangeForm(UserChangeForm):
     class Meta:
         model = get_user_model()

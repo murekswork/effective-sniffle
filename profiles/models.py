@@ -55,6 +55,7 @@ class UploadedProfilePictures(models.Model):
     image = models.ImageField(blank=True, upload_to=create_user_path)
 
 
+
 class Profile(models.Model):
     GENDER_CHOICES = [
         ('M', 'MALE'),
@@ -108,6 +109,6 @@ class Profile(models.Model):
         return reverse('profile', args=[str(self.user.id)])
 
     def __str__(self):
-        return f'{self.first_name} {self.last_name}'
+        return f'{self.first_name} {self.last_name} : {self.user}'
 
 # Create your models here.

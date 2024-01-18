@@ -8,3 +8,5 @@ logs.txt
 logs1.txt
 **docker**
 *venv*
+*.idea/
+*.idea/*

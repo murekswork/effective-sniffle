@@ -49,3 +49,5 @@ typing_extensions==4.9.0
 tzdata==2023.3
 urllib3==2.1.0
 zope.interface==6.1
+GDAL==3.2.2.1
+django-leaflet==0.29.0

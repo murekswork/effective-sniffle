@@ -31,6 +31,7 @@ urlpatterns = [
     path('', include('chats.urls')),
     path('', include('bots_logic.urls')),
     path('moderating/', include('moderating.urls')),
+    path('', include('mapp.urls')),
 ] + static(
 settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
 )

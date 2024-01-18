@@ -15,7 +15,7 @@ from pathlib import Path
 from django.urls import reverse_lazy
 from environs import Env
 import socket
-
+import os
 
 env = Env()
 env.read_env()
@@ -36,7 +36,7 @@ DEBUG = env('DJANGO_DEBUG')
 
 ALLOWED_HOSTS = ['*', '192.168.43.20']
 
-
+GDAL_LIBRARY_PATH = '/usr/lib/libgdal.so'
 # Application definition
 
 INSTALLED_APPS = [
@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'debug_toolbar',
+    'leaflet',
 
     'accounts.apps.AccountsConfig',
     'profiles.apps.ProfilesConfig',
@@ -64,6 +65,7 @@ INSTALLED_APPS = [
     'chats.apps.ChatsConfig',
     'bots_logic.apps.BotsLogicConfig',
     'moderating.apps.ModeratingConfig',
+    'mapp.apps.MappConfig',
 ]
 
 ASGI_APPLICATION = 'project_core.asgi.application'
@@ -152,7 +154,7 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
+# SECURE_SSL_REDIRECT = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
@@ -182,13 +184,13 @@ AUTH_USER_MODEL = 'accounts.CustomUser'
 ACCOUNT_LOGOUT_REDIRECT_URL = 'home'
 LOGIN_REDIRECT_URL = 'home'
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST='smtp.gmail.com'
-EMAIL_PORT=587
-EMAIL_HOST_USER = "murekswork@gmail.com"
-EMAIL_HOST_PASSWORD = 0xABAD1DEA
-EMAIL_USE_TLS=True
-DEFAULT_FROM_EMAIL = 'admin@dateking.com'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# EMAIL_HOST='smtp.gmail.com'
+# EMAIL_PORT=587
+# EMAIL_HOST_USER = "murekswork@gmail.com"
+# EMAIL_HOST_PASSWORD = 0xABAD1DEA
+# EMAIL_USE_TLS=True
+# DEFAULT_FROM_EMAIL = 'admin@dateking.com'
 
 ACCOUNT_SESSION_REMEMBER = True
 ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = False

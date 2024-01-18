@@ -1,0 +1,236 @@
+{% extends '_base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+	{% load leaflet_tags %}
+    {% leaflet_js %}
+    {% leaflet_css %}
+    {% load static %}
+
+<style>
+
+</style>
+
+
+    <button class="btn btn-info" style="position: absolute; z-index: 999999; top: 90%; right: 10%" id="locate-button">Share location</button>
+    <button class="btn btn-danger" style="position: absolute; z-index: 999999; top: 80%; right: 20%" id="hide-location-button">Hide my location</button>
+    <div class="container w-100" id="map" style="height: 1000px"><button id="locate-button">Share location</button></div>
+    <input name="csrfmiddlewaretoken" hidden="" type="text" value="{% csrf_token %}">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+       // Wait for the DOM to be fully loaded before running the code
+
+
+       var newIcons = L.Icon.extend({
+            options: {
+                iconSize: [70,70],
+                shadowSize: [0,0],
+                iconAnchor: [22,94],
+                shadowAnchor: [0, 0],
+                popupAnchor: [-3, -76]
+            }
+        });
+
+        var girlIcon = new newIcons({
+            iconUrl: '{% static 'icons/marker_girl.png' %}',
+            shadowUrl: '{% static 'icons/marker_girl.png' %}',
+        })
+
+       var boyIcon = new newIcons({
+           iconUrl: '{% static 'icons/marker_boy.png' %}',
+           shadowUrl: '{% static 'icons/marker_boy.png' %}',
+       })
+
+
+       document.addEventListener('DOMContentLoaded', function() {
+
+
+           // Get a reference to the locate button
+           var locateButton = document.getElementById('locate-button');
+
+           // Add a click event listener to the button
+           locateButton.addEventListener('click', function() {
+               // Use Leaflet's locate method to get the user's location
+               map.locate({setView: true, maxZoom: 16});
+           });
+       });
+   </script>
+    <script>
+        var map = L.map('map').setView([59.9310584, 30.3609097], 30);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+        }).addTo(map);
+
+
+
+
+
+        map.on('locationfound', function(e) {
+           var marker = L.marker(e.latlng, {icon: girlIcon}).addTo(map);
+           marker.id = '{{ user.id }}'
+           $.ajax( {
+                url: '{% url 'ajax-send-location' %}',
+                type: 'POST',
+                data: {'longitude': e.longitude,
+                        'latitude': e.latitude,
+                        'csrfmiddlewaretoken': document.getElementsByName('csrfmiddlewaretoken')[0].value},
+                success:
+
+                    chatSocketCreate.send(JSON.stringify({
+                        '121242':
+                            {'location_id': '124212241',
+                            'latitude': e.latitude,
+                            'longitude': e.longitude,
+                            'profile': {
+                                        'first_name': '{{user.profile.first_name}}',
+                                        'last_name': '{{user.profile.last_name}}',
+                                        'gender': '{{user.profile.gender}}',
+                                        'profile_url': '{{user.profile.get_absolute_url}}',
+                                        'photo': '{{user.profile.profile_main_picture.image.url}}'
+                                        }
+                            }
+                        }
+                    ))
+                    {#function (profile) {#}
+                    {#if (profile.first_name) {#}
+                    {#    marker.bindPopup(`<div style="background: deeppink;" class=""><p style="color: white; font-size: larger" class="small text-muted">#}
+                    {#        <a href="${profile.profile_url}">Unlock adress?</a>#}
+                    {#        <br>#}
+                    {#        <a href="">${profile.first_name}</a>#}
+                    {#        <a href="">${profile.last_name}</a>#}
+                    {#        <a href="">${profile.last_name}</a>#}
+                    {#        <img width="35px" src="${profile.profile_picture}" alt=""/>#}
+                    {#    </p></div>`).openPopup() } else console.log('Some trouble')#}
+
+
+                })
+           } )
+       ;
+
+
+
+    </script>
+
+
+    <script>
+
+
+        const chatSocketCreate = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/map/public_map'
+            + '/'
+        );
+
+
+        chatSocketCreate.onopen = function(e) {
+        };
+
+
+        {#chatSocketCreate.onmessage = function(e) {#}
+        {#    const data = JSON.parse(e.data);#}
+        {#    var d = document.createElement('div')#}
+        {##}
+        {#    console.log(data.message)#}
+        {#    console.log(data.sender_id)#}
+        {#    console.log(data.sender_profile_photo_url)#}
+        {#    console.log(data.sender_name)#}
+        {#    console.log(data.send_time)#}
+        {##}
+        {#    if (data.sender_id==='{{ user.pk }}') {#}
+
+        {#    document.querySelector('#message_story').innerHTML +=#}
+        {#                        `<div class="chat-message-left pb-4">#}
+		{#						<div>#}
+		{#							<img src="${data.sender_profile_photo_url}" class="rounded-circle mr-1" alt="chat-profile-picture" width="40" height="40">#}
+		{#							<div class="text-muted small text-nowrap mt-2">${data.send_time}</div>#}
+		{#						</div>#}
+		{#						<div class="flex-shrink-1 bg-light rounded py-2 px-3 ml-3">#}
+		{#							<div class="font-weight-bold mb-1">${data.sender_name}</div>#}
+		{#							${data.message}#}
+		{#						</div>#}
+        {#    </div>`}#}
+        {##}
+        {#    else document.querySelector('#message_story').innerHTML +=#}
+        {#                        `<div class="chat-message-right pb-4">#}
+        {#                            <div>#}
+        {#                                <img style="margin-left: 50%!important;" src="${data.sender_profile_photo_url}" class="rounded-circle mr-1" alt="chat-profile-picture" width="40" height="40">#}
+        {#                                <div class="text-muted small text-nowrap mt-2">${data.send_time}</div>#}
+        {#                            </div>#}
+        {#                            <div class="flex-shrink-1 bg-light rounded py-2 px-3 mr-3">#}
+        {#                                <div class="font-weight-bold mb-1">${data.sender_name}</div>#}
+        {#                                ${data.message}#}
+        {#                            </div>#}
+        {#                        </div>`#}
+        {##}
+        {##}
+        chatSocketCreate.onmessage = function (message) {
+            const data = JSON.parse(message.data)
+            if (data['type'] === 'location_delete') {
+                console.log('DELETE REQUEST', data)
+            }
+
+            for (var key in data) {
+                console.log(data[key]['profile'])
+                if (data[key]['profile']['gender'] !== 'F') {
+                    var temp_marker_girl = L.marker([parseFloat(data[key]['latitude']), parseFloat(data[key]['longitude'])], {icon: girlIcon}).addTo(map);
+                    temp_marker_girl.bindPopup(
+                        `<div>
+                            <a href="${data[key]['profile']['profile_url']}">
+                            <p>${data[key]['profile']['first_name']}</p>
+                            <p>${data[key]['profile']['last_name']}</p>
+                            <img width="45" src="${data[key]['profile']['photo']}" alt="">
+                            </a>
+                        </div>`
+                    )
+                }
+                else {
+                    var temp_marker_boy = L.marker([parseFloat(data[key]['latitude']), parseFloat(data[key]['longitude'])], {icon: boyIcon}).addTo(map);
+                    temp_marker_boy.bindPopup(
+                        `<div>
+                            <a href="${data[key]['profile']['profile_url']}">
+                            <p>${data[key]['profile']['first_name']}</p>
+                            <p>${data[key]['profile']['last_name']}</p>
+                            <img  width="45" src="${data[key]['profile']['photo']}" alt="">
+                            </a>
+                        </div>`
+                    )
+
+                }
+            }
+        }
+
+
+
+        chatSocketCreate.onclose = function(e) {
+            console.error('Chat socket closed unexpectedly');
+        };
+
+        document.getElementById('hide-location-button').addEventListener('click', function () {
+
+           chatSocketCreate.send(JSON.stringify({
+                        'type': 'location_delete',
+                        'user_id': '{{ user.id }}'
+
+                    }))});
+
+        {#document.querySelector('#chat-message-input').focus();#}
+        {#document.querySelector('#chat-message-input').onkeyup = function(e) {#}
+        {#    if (e.key === 'Enter') {  // enter, return#}
+        {#        document.querySelector('#chat-message-submit').click();#}
+        {#    }#}
+
+
+        {#document.querySelector('#chat-message-submit').onclick = function(e) {#}
+        {#    const messageInputDom = document.querySelector('#chat-message-input');#}
+        {#    const message = messageInputDom.value;#}
+        {#    chatSocketCreate.send(JSON.stringify({#}
+        {#        'message': message,#}
+        {#        'sender_name': '{{ user.profile.first_name }} {{ user.profile.last_name }}',#}
+        {#        'sender_id': '{{ user.pk }}',#}
+        {#        'sender_profile_photo_url': '{{ user.profile.profile_main_picture.image.url }}',#}
+        {#    }));#}
+        {#    messageInputDom.value = '';#}
+
+    </script>
+{% endblock %}

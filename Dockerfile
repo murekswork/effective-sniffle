@@ -7,6 +7,10 @@ ENV PYTHONBUFFERED 1
 WORKDIR /code
 
 COPY ./requirements.txt .
+RUN apt-get update
+RUN apt-get -y install libgdal-dev
+RUN apt-get update
+RUN apt-get -y install g++
 RUN pip install -r requirements.txt
 
 COPY . .

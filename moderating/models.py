@@ -49,7 +49,7 @@ class Complain(models.Model):
 			chats = profile.chat_set.select_related()
 			for chat in chats:
 				chat.profile.remove(self.responsible_moderator.profile)
-	
+
 			profile.save()
 			self.receiver.save()
 		self.save()
