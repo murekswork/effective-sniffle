@@ -9,7 +9,7 @@ from .mixins import ProfileRequiredMixin
 from .models import Profile, Interest, UploadedProfilePictures, Notification
 from .forms import ProfileCreationForm, ImageForm
 from moderating.forms import ComplainForm
-
+from project_core.controllers_beta import NotificationControllerMixin
 
 class ProfileCreationView(LoginRequiredMixin, CreateView):
     form_class = ProfileCreationForm
@@ -22,20 +22,21 @@ class ProfileCreationView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 # Create your views here.
 
-class ProfileNotificationsView(LoginRequiredMixin, ProfileRequiredMixin, ListView):
+class ProfileNotificationsView(LoginRequiredMixin, ProfileRequiredMixin, NotificationControllerMixin, ListView):
     template_name = 'profiles/notifications.html'
     model = Notification
     context_object_name = 'notifications'
 
     def get_queryset(self):
-        return Notification.objects.filter(recipient=self.request.user.profile)
+        return Notification.objects.filter(recipient=self.request.user.profile, read_status=False)
 
     def get(self, request, *args, **kwargs):
         context = {}
         context['notifications'] = self.get_queryset()
         context['unread_notifications'] = context['notifications']
-        context['notifications'].update(read_status=True)
-        return render(request, self.template_name, context)
+        response = render(request, self.template_name, context)
+        self.read_all_notifications(context['notifications'])
+        return response
 
 class ProfileActivityMatchesView(TemplateView):
     template_name = 'profile/activity.html'
